@@ -961,6 +961,20 @@
                 // Initialize EmailJS with your public key
                 emailjs.init("Psdc4pgmrFBYDPM_8");
                 
+                // Get all uploaded images
+                const imageInput = e.target.querySelector('input[name="images"]');
+                const imageFiles = imageInput ? imageInput.files : [];
+                
+                // Convert FileList to Array for easier handling
+                const imageArray = Array.from(imageFiles);
+                
+                // Create attachments array for EmailJS
+                const attachments = imageArray.map((file, index) => ({
+                    filename: `image_${index + 1}.${file.name.split('.').pop()}`,
+                    content: file,
+                    contentType: file.type
+                }));
+                
                 // Organize data into sections for better email formatting
                 const templateParams = {
                     // Basic Information
@@ -1042,7 +1056,8 @@
                     unloading_help_needed: finalData.unloading_help_needed || 'Nije navedeno',
                     
                     // Images
-                    has_images: finalData.images ? 'Da' : 'Ne'
+                    has_images: imageArray.length > 0 ? 'Da' : 'Ne',
+                    attachments: attachments
                 };
                 
                 // Send email using EmailJS
