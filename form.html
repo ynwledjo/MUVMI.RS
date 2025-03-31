@@ -1018,7 +1018,10 @@
                             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
                             .join(' ');
                         
-                        detailsString += `${formattedKey}: ${value}\n`;
+                        // Handle empty values
+                        if (value && value !== '') {
+                            detailsString += `${formattedKey}: ${value}\n`;
+                        }
                     }
                 }
                 
