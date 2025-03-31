@@ -965,24 +965,26 @@
                     const details = Object.fromEntries(formData);
                     const finalData = { ...window.moveData, ...details };
                     
-                    // Handle image files - limit to first 3 images and compress them
-                    const imageInput = e.target.querySelector('input[type="file"]');
+                    // Find all image boxes that have images
+                    const imageBoxes = document.querySelectorAll('.image-upload-box.has-image');
                     let imageAttachments = [];
                     
-                    if (imageInput && imageInput.files.length > 0) {
-                        // Take only first 3 images
-                        const maxImages = Math.min(imageInput.files.length, 3);
-                        for (let i = 0; i < maxImages; i++) {
-                            const file = imageInput.files[i];
-                            const compressedBase64 = await compressAndConvertToBase64(file);
-                            imageAttachments.push(compressedBase64);
+                    // Process each image box
+                    for (let i = 0; i < Math.min(imageBoxes.length, 3); i++) {
+                        const box = imageBoxes[i];
+                        const backgroundImage = box.style.backgroundImage;
+                        if (backgroundImage) {
+                            // Extract the base64 data from the background-image URL
+                            const base64Data = backgroundImage.replace(/^url\("data:image\/[^;]+;base64,/, '')
+                                .replace(/"\)$/, '');
+                            imageAttachments.push(base64Data);
                         }
                     }
                     
                     // Format the message content
                     const messageContent = formatEmailContent(finalData);
                     
-                    // Prepare template parameters - be explicit about each field
+                    // Prepare template parameters
                     const templateParams = {
                         to_name: "Muvmi Tim",
                         from_name: finalData.name || '',
@@ -997,11 +999,11 @@
                     };
                     
                     // Debug log
-                    console.log('Sending email with template parameters:', {
+                    console.log('Sending email with images:', {
                         ...templateParams,
-                        image1: imageAttachments[0] ? 'Image 1 attached' : 'No image',
-                        image2: imageAttachments[1] ? 'Image 2 attached' : 'No image',
-                        image3: imageAttachments[2] ? 'Image 3 attached' : 'No image'
+                        image1: imageAttachments[0] ? 'Image 1 present' : 'No image 1',
+                        image2: imageAttachments[1] ? 'Image 2 present' : 'No image 2',
+                        image3: imageAttachments[2] ? 'Image 3 present' : 'No image 3'
                     });
                     
                     // Send email using EmailJS
@@ -1016,7 +1018,9 @@
                     alert('Hvala! Vaš zahtev je uspešno poslat. Kontaktiraćemo vas uskoro.');
                     
                     // Redirect to main page after successful submission
-                    window.location.href = '/';
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1500);
                     
                 } catch (error) {
                     console.error('Failed to send email:', error);
