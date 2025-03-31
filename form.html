@@ -951,22 +951,19 @@
                 
                 const formData = new FormData();
                 
-                // Debug log
-                console.log('Files being uploaded:', e.target.querySelector('input[type="file"]').files);
-                
                 // Add all form fields to FormData
-                const formFields = e.target.querySelectorAll('input, select, textarea');
+                const formFields = e.target.querySelectorAll('input:not([type="file"]), select, textarea');
                 formFields.forEach(field => {
-                    if (field.type === 'file') {
-                        // Handle multiple files
-                        const files = field.files;
-                        for (let i = 0; i < files.length; i++) {
-                            formData.append('images', files[i]);
-                        }
-                    } else {
-                        formData.append(field.name, field.value);
-                    }
+                    formData.append(field.name, field.value);
                 });
+                
+                // Add files from the stored Map
+                const fileInput = e.target.querySelector('input[type="file"]');
+                if (fileInput && window.selectedFiles) {
+                    window.selectedFiles.forEach((file, index) => {
+                        formData.append(`image${index}`, file);
+                    });
+                }
                 
                 // Add category to form data
                 formData.append('Category', category);
@@ -975,6 +972,17 @@
                 const specificDateInput = e.target.querySelector('input[name="specific_date"]');
                 if (specificDateInput && specificDateInput.getAttribute('data-formatted-date')) {
                     formData.set('specific_date', specificDateInput.getAttribute('data-formatted-date'));
+                }
+                
+                // Add this just before the fetch call
+                console.log('Selected files:', window.selectedFiles);
+                console.log('FormData contents:');
+                for (let pair of formData.entries()) {
+                    if (pair[1] instanceof File) {
+                        console.log(pair[0], 'File:', pair[1].name, pair[1].size, 'bytes');
+                    } else {
+                        console.log(pair[0], pair[1]);
+                    }
                 }
                 
                 try {
@@ -991,13 +999,8 @@
                         }
                     });
                     
-                    // Debug log response
-                    console.log('Response:', await response.clone().text());
-                    
                     if (response.ok) {
-                        // Show success message
                         alert('Vaš zahtev je uspešno poslat! Uskoro ćemo vas kontaktirati.');
-                        // Redirect to home page
                         window.location.href = 'main.html';
                     } else {
                         throw new Error('Submission failed');
@@ -1124,7 +1127,7 @@
                 const hiddenInput = document.createElement('input');
                 hiddenInput.type = 'file';
                 hiddenInput.className = 'hidden-file-input';
-                hiddenInput.name = 'images';  // Changed from 'images[]'
+                hiddenInput.name = 'images';
                 hiddenInput.multiple = true;
                 hiddenInput.accept = 'image/*';
                 hiddenInput.required = field.required !== false;
@@ -1136,6 +1139,9 @@
                 // Create the first upload box with plus icon
                 const uploadBox = createImageUploadBox(hiddenInput, container);
                 container.appendChild(uploadBox);
+                
+                // Store selected files
+                window.selectedFiles = new Map();
                 
                 // Add the container and hidden input to the field div
                 fieldDiv.appendChild(container);
@@ -1186,6 +1192,12 @@
                     
                     // Process each file
                     Array.from(this.files).forEach((file, index) => {
+                        // Store the file
+                        if (!window.selectedFiles) {
+                            window.selectedFiles = new Map();
+                        }
+                        window.selectedFiles.set(file.name, file);
+                        
                         // Create a new box for each image
                         const newBox = document.createElement('div');
                         newBox.className = 'image-upload-box';
@@ -1196,18 +1208,21 @@
                     // Always add only one new empty upload box at the end
                     const newEmptyBox = createEmptyUploadBox(hiddenInput, container);
                     container.appendChild(newEmptyBox);
-                    
-                    // Clear the input to allow selecting the same files again
-                    hiddenInput.value = '';
                 }
             });
             
             // Handle remove button click
             removeBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
+                
+                // Remove file from stored files
+                if (window.selectedFiles) {
+                    window.selectedFiles.delete(file.name);
+                }
+                
                 box.remove();
                 
-                // If no empty box exists, add one
+                // Check if we need to add an empty box
                 const emptyBoxExists = Array.from(container.children).some(
                     child => child.classList.contains('image-upload-box') && !child.classList.contains('has-image')
                 );
@@ -1258,17 +1273,11 @@
                 removeBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     
-                    // Create a new FileList without the removed file
-                    const dt = new DataTransfer();
-                    const files = hiddenInput.files;
-                    
-                    for (let i = 0; i < files.length; i++) {
-                        if (files[i].name !== file.name) {
-                            dt.items.add(files[i]);
-                        }
+                    // Remove file from stored files
+                    if (window.selectedFiles) {
+                        window.selectedFiles.delete(file.name);
                     }
                     
-                    hiddenInput.files = dt.files; // Update the input's files
                     box.remove();
                     
                     // Check if we need to add an empty box
