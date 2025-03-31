@@ -439,7 +439,7 @@
 
     <script>
         (function() {
-            emailjs.init("Psdc4pgmrFBYDPM_8"); // Replace with your EmailJS public key
+            emailjs.init("Psdc4pgmrFBYDPM_8");
         })();
 
         // Form configuration for each category
@@ -950,9 +950,9 @@
             
             formContainer.appendChild(formGrid);
             
-            // Move the form submission handler here and fix it
+            // Add the form submission handler
             const form = document.getElementById('details-form');
-            form.addEventListener('submit', async function(e) {
+            form.onsubmit = async function(e) {
                 e.preventDefault();
                 
                 // Show loading state
@@ -979,19 +979,22 @@
                         message: messageContent
                     };
                     
-                    console.log('Sending email with params:', templateParams); // Debug log
+                    // Debug log
+                    console.log('Attempting to send email with params:', templateParams);
                     
-                    // Send email using EmailJS
-                    const response = await emailjs.send('service_jmhj8ye', 'template_j8ve8v6', templateParams);
-                    console.log('SUCCESS!', response.status, response.text);
+                    // Send email using EmailJS with explicit service and template IDs
+                    const response = await emailjs.send(
+                        'service_jmhj8ye',  // Your EmailJS service ID
+                        'template_j8ve8v6', // Your EmailJS template ID
+                        templateParams,
+                        'Psdc4pgmrFBYDPM_8' // Your EmailJS public key
+                    );
                     
-                    // Show success message
+                    console.log('Email sent successfully:', response);
                     alert('Hvala! Vaš zahtev je uspešno poslat. Kontaktiraćemo vas uskoro.');
                     
-                    // Redirect after short delay
-                    setTimeout(() => {
-                        window.location.href = 'main.html';
-                    }, 1500);
+                    // Redirect to main page after successful submission
+                    window.location.href = '/';  // Changed to root path
                     
                 } catch (error) {
                     console.error('Failed to send email:', error);
@@ -1001,7 +1004,7 @@
                     submitButton.disabled = false;
                     submitButton.textContent = 'Pošalji zahtev';
                 }
-            });
+            };
         }
 
         function createFormField(field) {
