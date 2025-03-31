@@ -401,12 +401,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Add EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script type="text/javascript">
-        (function() {
-            // Initialize EmailJS with your public key
-            emailjs.init("Psdc4pgmrFBYDPM_8"); // Replace with your actual public key
-        })();
-    </script>
 </head>
 <body>
     <div class="container">
@@ -949,7 +943,48 @@
             formContainer.appendChild(formGrid);
             
             // Handle form submission
-            formContainer.addEventListener('submit', handleFormSubmit);
+            formContainer.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                
+                // Handle the date format properly
+                const specificDateInput = e.target.querySelector('input[name="specific_date"]');
+                if (specificDateInput && specificDateInput.getAttribute('data-formatted-date')) {
+                    // Use the formatted date in dd/mm/yyyy format
+                    formData.set('specific_date', specificDateInput.getAttribute('data-formatted-date'));
+                }
+                
+                const details = Object.fromEntries(formData);
+                
+                // Combine with initial data
+                const finalData = { ...window.moveData, ...details };
+                
+                // Initialize EmailJS with your public key
+                emailjs.init("Psdc4pgmrFBYDPM_8"); // Replace with your actual public key
+                
+                // Prepare the email template parameters
+                const templateParams = {
+                    category: finalData.category,
+                    pickup_address: finalData.pickup_address,
+                    delivery_address: finalData.delivery_address,
+                    name: finalData.name,
+                    phone: finalData.phone,
+                    ...finalData
+                };
+                
+                // Send email using EmailJS
+                emailjs.send('service_jmhj8ye', 'template_j8ve8v6', templateParams)
+                    .then(function(response) {
+                        // Show success message
+                        alert('Vaš zahtev je uspešno poslat! Kontaktiraćemo vas uskoro.');
+                        // Redirect to main page
+                        window.location.href = 'main.html';
+                    }, function(error) {
+                        // Show error message
+                        alert('Došlo je do greške prilikom slanja zahteva. Molimo pokušajte ponovo.');
+                        console.error('EmailJS error:', error);
+                    });
+            });
         }
 
         function createFormField(field) {
@@ -1215,117 +1250,6 @@
             };
             reader.readAsDataURL(file);
         }
-
-        // Function to convert base64 to blob
-        function base64ToBlob(base64, type = 'image/jpeg') {
-            const byteString = atob(base64.split(',')[1]);
-            const ab = new ArrayBuffer(byteString.length);
-            const ia = new Uint8Array(ab);
-            for (let i = 0; i < byteString.length; i++) {
-                ia[i] = byteString.charCodeAt(i);
-            }
-            return new Blob([ab], { type: type });
-        }
-
-        // Function to handle form submission
-        async function handleFormSubmit(e) {
-            e.preventDefault();
-            const form = e.target;
-            const formData = new FormData(form);
-            
-            // Get all form fields
-            const formFields = {};
-            formData.forEach((value, key) => {
-                formFields[key] = value;
-            });
-
-            // Create a clean HTML template for the email
-            let emailContent = `
-                <h2>Novi zahtev za transport</h2>
-                <p><strong>Kategorija:</strong> ${window.moveData?.category || 'N/A'}</p>
-                <p><strong>Adresa preuzimanja:</strong> ${formFields.pickup_address || 'N/A'}</p>
-                <p><strong>Adresa dostave:</strong> ${formFields.delivery_address || 'N/A'}</p>
-                <p><strong>Ime:</strong> ${formFields.name || 'N/A'}</p>
-                <p><strong>Telefon:</strong> ${formFields.phone || 'N/A'}</p>
-                <p><strong>Opis:</strong> ${formFields.description || 'N/A'}</p>
-            `;
-
-            // Add all other form fields except images
-            for (const [key, value] of Object.entries(formFields)) {
-                if (key !== 'images' && key !== 'pickup_address' && key !== 'delivery_address' && 
-                    key !== 'name' && key !== 'phone' && key !== 'description') {
-                    const label = key.split('_').map(word => 
-                        word.charAt(0).toUpperCase() + word.slice(1)
-                    ).join(' ');
-                    emailContent += `<p><strong>${label}:</strong> ${value || 'N/A'}</p>`;
-                }
-            }
-
-            // Count images
-            const imageInputs = form.querySelectorAll('input[type="file"]');
-            let imageCount = 0;
-            for (const input of imageInputs) {
-                if (input.files && input.files.length > 0) {
-                    imageCount = input.files.length;
-                }
-            }
-            emailContent += `<p><strong>Broj priloženih slika:</strong> ${imageCount}</p>`;
-
-            // Prepare the data for email
-            const templateParams = {
-                to_name: 'Muvmi Support',
-                from_name: formFields.name || 'N/A',
-                category: window.moveData?.category || 'N/A',
-                pickup_address: formFields.pickup_address || 'N/A',
-                delivery_address: formFields.delivery_address || 'N/A',
-                name: formFields.name || 'N/A',
-                phone: formFields.phone || 'N/A',
-                description: formFields.description || 'N/A',
-                message: emailContent
-            };
-
-            // Add all other form fields to templateParams
-            for (const [key, value] of Object.entries(formFields)) {
-                if (key !== 'images' && key !== 'pickup_address' && key !== 'delivery_address' && 
-                    key !== 'name' && key !== 'phone' && key !== 'description') {
-                    templateParams[key] = value || 'N/A';
-                }
-            }
-
-            try {
-                // Show loading state
-                const submitBtn = form.querySelector('button[type="submit"]');
-                const originalText = submitBtn.textContent;
-                submitBtn.textContent = 'Slanje...';
-                submitBtn.disabled = true;
-
-                // Send email using EmailJS
-                await emailjs.send(
-                    'service_jmhj8ye',
-                    'template_j8ve8v6',
-                    templateParams
-                );
-
-                // Show success message
-                alert('Vaš zahtev je uspešno poslat! Kontaktiraćemo vas uskoro.');
-                window.location.href = 'main.html';
-            } catch (error) {
-                console.error('Error sending email:', error);
-                alert('Došlo je do greške prilikom slanja zahteva. Molimo pokušajte ponovo.');
-                
-                // Reset button state
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            }
-        }
-
-        // Add form submission handler
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('details-form');
-            if (form) {
-                form.addEventListener('submit', handleFormSubmit);
-            }
-        });
     </script>
 </body>
 </html>
