@@ -834,18 +834,19 @@
                 }
             } else {
                 // For other categories, follow the regular flow
-            const categoryFields = formConfigs[category] || [];
-            categoryFields.forEach(field => {
-                formGrid.appendChild(createFormField(field));
-            });
-            
-                // Add common fields only for categories not already handled
+                const categoryFields = formConfigs[category] || [];
+                categoryFields.forEach(field => {
+                    formGrid.appendChild(createFormField(field));
+                });
+                
+                // Add common fields only for categories not already handled and not concrete
                 if (category !== 'moving' && category !== 'furniture' && category !== 'other' && 
                     category !== 'boxes' && category !== 'cargo' && category !== 'vehicles' && 
-                    category !== 'vehicle_parts' && category !== 'animals' && category !== 'construction_waste') {
-            commonFields.forEach(field => {
-                formGrid.appendChild(createFormField(field));
-            });
+                    category !== 'vehicle_parts' && category !== 'animals' && category !== 'construction_waste' &&
+                    category !== 'concrete') {
+                    commonFields.forEach(field => {
+                        formGrid.appendChild(createFormField(field));
+                    });
                 }
             }
             
