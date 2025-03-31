@@ -965,38 +965,43 @@
                     const details = Object.fromEntries(formData);
                     const finalData = { ...window.moveData, ...details };
                     
-                    // Handle image files
+                    // Handle image files - limit to first 3 images and compress them
                     const imageInput = e.target.querySelector('input[type="file"]');
                     let imageAttachments = [];
                     
                     if (imageInput && imageInput.files.length > 0) {
-                        // Convert images to base64
-                        for (let i = 0; i < imageInput.files.length; i++) {
+                        // Take only first 3 images
+                        const maxImages = Math.min(imageInput.files.length, 3);
+                        for (let i = 0; i < maxImages; i++) {
                             const file = imageInput.files[i];
-                            const base64 = await convertToBase64(file);
-                            imageAttachments.push(base64);
+                            const compressedBase64 = await compressAndConvertToBase64(file);
+                            imageAttachments.push(compressedBase64);
                         }
                     }
                     
                     // Format the message content
                     const messageContent = formatEmailContent(finalData);
                     
-                    // Prepare template parameters
+                    // Prepare template parameters - be explicit about each field
                     const templateParams = {
                         to_name: "Muvmi Tim",
-                        from_name: finalData.name,
-                        from_phone: '+381 ' + finalData.phone,
-                        category: window.moveData.category,
-                        pickup_address: finalData.pickup_address,
-                        delivery_address: finalData.delivery_address,
-                        message: messageContent,
-                        images: imageAttachments // Add the base64 images array
+                        from_name: finalData.name || '',
+                        from_phone: '+381 ' + (finalData.phone || ''),
+                        category: window.moveData.category || '',
+                        pickup_address: finalData.pickup_address || '',
+                        delivery_address: finalData.delivery_address || '',
+                        message: messageContent || '',
+                        image1: imageAttachments[0] || '',
+                        image2: imageAttachments[1] || '',
+                        image3: imageAttachments[2] || ''
                     };
                     
                     // Debug log
-                    console.log('Attempting to send email with params:', {
+                    console.log('Sending email with template parameters:', {
                         ...templateParams,
-                        images: `${imageAttachments.length} images attached`
+                        image1: imageAttachments[0] ? 'Image 1 attached' : 'No image',
+                        image2: imageAttachments[1] ? 'Image 2 attached' : 'No image',
+                        image3: imageAttachments[2] ? 'Image 3 attached' : 'No image'
                     });
                     
                     // Send email using EmailJS
@@ -1337,13 +1342,49 @@ Detalji zahteva:
             return content;
         }
 
-        // Add this helper function to convert files to base64
-        function convertToBase64(file) {
+        // Add this helper function to compress and convert images to base64
+        async function compressAndConvertToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        // Maximum dimensions
+                        const MAX_WIDTH = 800;
+                        const MAX_HEIGHT = 800;
+                        
+                        // Calculate new dimensions while maintaining aspect ratio
+                        if (width > height) {
+                            if (width > MAX_WIDTH) {
+                                height *= MAX_WIDTH / width;
+                                width = MAX_WIDTH;
+                            }
+                        } else {
+                            if (height > MAX_HEIGHT) {
+                                width *= MAX_HEIGHT / height;
+                                height = MAX_HEIGHT;
+                            }
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Convert to base64 with reduced quality
+                        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                        resolve(compressedBase64);
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
                 reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
             });
         }
     </script>
