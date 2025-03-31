@@ -991,7 +991,7 @@
                     Array.from(imageInput.files).forEach((file, index) => {
                         // Create a unique filename
                         const timestamp = new Date().getTime();
-                        const uniqueName = `image_${timestamp}_${index + 1}_${file.name}`;
+                        const uniqueName = `attachment_${timestamp}_${index + 1}`;
                         submitFormData.append(uniqueName, file);
                     });
                 }
