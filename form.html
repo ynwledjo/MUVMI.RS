@@ -970,30 +970,32 @@
                         from_phone: '+381 ' + (formData.get('phone') || ''),
                         pickup_address: formData.get('pickup_address') || '',
                         delivery_address: formData.get('delivery_address') || '',
-                        message: formatEmailContent(Object.fromEntries(formData)),
-                        attachments: [] // Initialize empty attachments array
+                        message: formatEmailContent(Object.fromEntries(formData))
                     };
 
                     // Process images if they exist
                     if (imageInput && imageInput.files.length > 0) {
                         const files = Array.from(imageInput.files);
-                        for (let i = 0; i < files.length; i++) {
-                            const file = files[i];
+                        const maxImages = Math.min(files.length, 20); // Limit to 20 images
+                        
+                        for (let i = 0; i < maxImages; i++) {
                             try {
-                                const compressedBlob = await compressImage(file);
-                                const base64String = await blobToBase64(compressedBlob);
-                                
-                                // Add file as attachment
-                                templateParams.attachments.push({
-                                    name: `image${i + 1}.jpg`,
-                                    data: base64String,
-                                    type: 'image/jpeg'
-                                });
+                                const base64String = await fileToBase64(files[i]);
+                                // Add each image as a separate parameter
+                                templateParams[`image_${i + 1}`] = base64String;
                             } catch (error) {
                                 console.error('Error processing image:', error);
                             }
                         }
+                        
+                        // Add the number of images
+                        templateParams.image_count = maxImages;
                     }
+
+                    console.log('Sending email with parameters:', {
+                        ...templateParams,
+                        image_count: templateParams.image_count || 0
+                    });
 
                     // Send email
                     const response = await emailjs.send(
@@ -1329,11 +1331,14 @@ Detalji zahteva:
             return content;
         }
 
-        // New function to compress image using canvas
-        async function compressImage(file) {
+        // New helper function to convert file to base64
+        function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function() {
+                    // Get the base64 string
+                    const base64String = reader.result;
+                    // Compress the image
                     const img = new Image();
                     img.onload = function() {
                         const canvas = document.createElement('canvas');
@@ -1359,30 +1364,14 @@ Detalji zahteva:
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
                         
-                        // Convert to blob
-                        canvas.toBlob(
-                            blob => resolve(blob),
-                            'image/jpeg',
-                            0.7 // quality
-                        );
+                        // Get compressed base64 string
+                        resolve(canvas.toDataURL('image/jpeg', 0.7));
                     };
                     img.onerror = reject;
-                    img.src = e.target.result;
+                    img.src = base64String;
                 };
                 reader.onerror = reject;
                 reader.readAsDataURL(file);
-            });
-        }
-
-        // Helper function to convert blob to base64
-        function blobToBase64(blob) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = function() {
-                    resolve(reader.result.split(',')[1]); // Remove data URL prefix
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
             });
         }
     </script>
