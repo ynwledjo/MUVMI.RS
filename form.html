@@ -1250,10 +1250,13 @@
             const form = e.target;
             const formData = new FormData(form);
             
-            // Get all form fields
+            // Get all form fields and format them properly
             const formFields = {};
             formData.forEach((value, key) => {
-                formFields[key] = value;
+                // Skip file inputs as they're handled separately
+                if (key !== 'images') {
+                    formFields[key] = value;
+                }
             });
 
             // Handle image uploads
@@ -1271,9 +1274,6 @@
                         reader.readAsDataURL(file);
                         const base64 = await base64Promise;
                         
-                        // Convert base64 to blob
-                        const blob = base64ToBlob(base64, file.type);
-                        
                         // Add to attachments
                         imageAttachments.push({
                             filename: file.name,
@@ -1284,10 +1284,19 @@
                 }
             }
 
-            // Prepare email template parameters
+            // Format the data for EmailJS template
             const templateParams = {
+                to_name: formFields.name || 'Admin',
+                from_name: formFields.name || 'User',
+                category: window.moveData?.category || 'N/A',
+                pickup_address: formFields.pickup_address || 'N/A',
+                delivery_address: formFields.delivery_address || 'N/A',
+                phone: formFields.phone || 'N/A',
+                description: formFields.description || 'N/A',
+                // Add all other form fields
                 ...formFields,
-                images: imageAttachments
+                // Add images if any
+                images: imageAttachments.length > 0 ? imageAttachments : null
             };
 
             try {
@@ -1299,8 +1308,8 @@
 
                 // Send email using EmailJS
                 await emailjs.send(
-                    'service_jmhj8ye', // Replace with your EmailJS service ID
-                    'template_j8ve8v6', // Replace with your EmailJS template ID
+                    'service_jmhj8ye',
+                    'template_j8ve8v6',
                     templateParams
                 );
 
