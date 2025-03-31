@@ -402,7 +402,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script>
         (function() {
-            emailjs.init("Psdc4pgmrFBYDPM_8"); // Your public key
+            emailjs.init("Psdc4pgmrFBYDPM_8");
         })();
     </script>
 </head>
@@ -950,60 +950,57 @@
             
             formContainer.appendChild(formGrid);
             
-            // Handle form submission
-            formContainer.addEventListener('submit', function(e) {
+            // Move the form submission handler here and fix it
+            const form = document.getElementById('details-form');
+            form.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                const formData = new FormData(e.target);
-                
-                // Handle the date format properly
-                const specificDateInput = e.target.querySelector('input[name="specific_date"]');
-                if (specificDateInput && specificDateInput.getAttribute('data-formatted-date')) {
-                    formData.set('specific_date', specificDateInput.getAttribute('data-formatted-date'));
-                }
-                
-                const details = Object.fromEntries(formData);
-                const finalData = { ...window.moveData, ...details };
                 
                 // Show loading state
                 const submitButton = e.target.querySelector('button[type="submit"]');
-                const originalButtonText = submitButton.textContent;
                 submitButton.disabled = true;
                 submitButton.textContent = 'Slanje...';
-
-                // Format the message content
-                const messageContent = formatEmailContent(finalData);
-
-                // Prepare template parameters
-                const templateParams = {
-                    to_name: "Muvmi Tim",
-                    from_name: finalData.name,
-                    from_phone: '+381 ' + finalData.phone,
-                    category: window.moveData.category,
-                    pickup_address: finalData.pickup_address,
-                    delivery_address: finalData.delivery_address,
-                    message: messageContent,
-                    reply_to: finalData.email || "your-default-email@example.com" // Add a default email or remove if not needed
-                };
-
-                // Send email using EmailJS
-                emailjs.send('service_jmhj8ye', 'template_j8ve8v6', templateParams)
-                    .then(function(response) {
-                        console.log('SUCCESS!', response.status, response.text);
-                        // Show success message to user
-                        alert('Hvala! Vaš zahtev je uspešno poslat. Kontaktiraćemo vas uskoro.');
-                        // Redirect to main page after successful submission
-                        setTimeout(() => {
-                            window.location.href = 'main.html';
-                        }, 1500);
-                    })
-                    .catch(function(error) {
-                        console.error('FAILED...', error);
-                        // Show error message to user
-                        alert('Došlo je do greške. Molimo pokušajte ponovo ili nas kontaktirajte direktno.');
-                        // Reset button state
-                        submitButton.disabled = false;
-                        submitButton.textContent = originalButtonText;
-                    });
+                
+                try {
+                    const formData = new FormData(e.target);
+                    const details = Object.fromEntries(formData);
+                    const finalData = { ...window.moveData, ...details };
+                    
+                    // Format the message content
+                    const messageContent = formatEmailContent(finalData);
+                    
+                    // Prepare template parameters
+                    const templateParams = {
+                        to_name: "Muvmi Tim",
+                        from_name: finalData.name,
+                        from_phone: '+381 ' + finalData.phone,
+                        category: window.moveData.category,
+                        pickup_address: finalData.pickup_address,
+                        delivery_address: finalData.delivery_address,
+                        message: messageContent
+                    };
+                    
+                    console.log('Sending email with params:', templateParams); // Debug log
+                    
+                    // Send email using EmailJS
+                    const response = await emailjs.send('service_jmhj8ye', 'template_j8ve8v6', templateParams);
+                    console.log('SUCCESS!', response.status, response.text);
+                    
+                    // Show success message
+                    alert('Hvala! Vaš zahtev je uspešno poslat. Kontaktiraćemo vas uskoro.');
+                    
+                    // Redirect after short delay
+                    setTimeout(() => {
+                        window.location.href = 'main.html';
+                    }, 1500);
+                    
+                } catch (error) {
+                    console.error('Failed to send email:', error);
+                    alert('Došlo je do greške. Molimo pokušajte ponovo ili nas kontaktirajte direktno.');
+                    
+                    // Reset button state
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Pošalji zahtev';
+                }
             });
         }
 
