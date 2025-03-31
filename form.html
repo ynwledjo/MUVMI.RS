@@ -949,24 +949,7 @@
             formContainer.appendChild(formGrid);
             
             // Handle form submission
-            formContainer.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                
-                // Handle the date format properly
-                const specificDateInput = e.target.querySelector('input[name="specific_date"]');
-                if (specificDateInput && specificDateInput.getAttribute('data-formatted-date')) {
-                    // Use the formatted date in dd/mm/yyyy format
-                    formData.set('specific_date', specificDateInput.getAttribute('data-formatted-date'));
-                }
-                
-                const details = Object.fromEntries(formData);
-                
-                // Combine with initial data
-                const finalData = { ...window.moveData, ...details };
-                console.log('Final form data:', finalData);
-                // Here you would typically send this data to your server
-            });
+            formContainer.addEventListener('submit', handleFormSubmit);
         }
 
         function createFormField(field) {
@@ -1250,13 +1233,10 @@
             const form = e.target;
             const formData = new FormData(form);
             
-            // Get all form fields and format them properly
+            // Get all form fields
             const formFields = {};
             formData.forEach((value, key) => {
-                // Skip file inputs as they're handled separately
-                if (key !== 'images') {
-                    formFields[key] = value;
-                }
+                formFields[key] = value;
             });
 
             // Handle image uploads
@@ -1284,19 +1264,18 @@
                 }
             }
 
-            // Format the data for EmailJS template
+            // Prepare the data for email
             const templateParams = {
-                to_name: formFields.name || 'Admin',
-                from_name: formFields.name || 'User',
                 category: window.moveData?.category || 'N/A',
                 pickup_address: formFields.pickup_address || 'N/A',
                 delivery_address: formFields.delivery_address || 'N/A',
+                name: formFields.name || 'N/A',
                 phone: formFields.phone || 'N/A',
                 description: formFields.description || 'N/A',
                 // Add all other form fields
                 ...formFields,
                 // Add images if any
-                images: imageAttachments.length > 0 ? imageAttachments : null
+                images: imageAttachments
             };
 
             try {
