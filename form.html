@@ -965,6 +965,19 @@
                     const details = Object.fromEntries(formData);
                     const finalData = { ...window.moveData, ...details };
                     
+                    // Handle image files
+                    const imageInput = e.target.querySelector('input[type="file"]');
+                    let imageAttachments = [];
+                    
+                    if (imageInput && imageInput.files.length > 0) {
+                        // Convert images to base64
+                        for (let i = 0; i < imageInput.files.length; i++) {
+                            const file = imageInput.files[i];
+                            const base64 = await convertToBase64(file);
+                            imageAttachments.push(base64);
+                        }
+                    }
+                    
                     // Format the message content
                     const messageContent = formatEmailContent(finalData);
                     
@@ -976,25 +989,29 @@
                         category: window.moveData.category,
                         pickup_address: finalData.pickup_address,
                         delivery_address: finalData.delivery_address,
-                        message: messageContent
+                        message: messageContent,
+                        images: imageAttachments // Add the base64 images array
                     };
                     
                     // Debug log
-                    console.log('Attempting to send email with params:', templateParams);
+                    console.log('Attempting to send email with params:', {
+                        ...templateParams,
+                        images: `${imageAttachments.length} images attached`
+                    });
                     
-                    // Send email using EmailJS with explicit service and template IDs
+                    // Send email using EmailJS
                     const response = await emailjs.send(
-                        'service_jmhj8ye',  // Your EmailJS service ID
-                        'template_j8ve8v6', // Your EmailJS template ID
+                        'service_jmhj8ye',
+                        'template_j8ve8v6',
                         templateParams,
-                        'Psdc4pgmrFBYDPM_8' // Your EmailJS public key
+                        'Psdc4pgmrFBYDPM_8'
                     );
                     
                     console.log('Email sent successfully:', response);
                     alert('Hvala! Vaš zahtev je uspešno poslat. Kontaktiraćemo vas uskoro.');
                     
                     // Redirect to main page after successful submission
-                    window.location.href = '/';  // Changed to root path
+                    window.location.href = '/';
                     
                 } catch (error) {
                     console.error('Failed to send email:', error);
@@ -1318,6 +1335,16 @@ Detalji zahteva:
             }
 
             return content;
+        }
+
+        // Add this helper function to convert files to base64
+        function convertToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
         }
     </script>
 </body>
