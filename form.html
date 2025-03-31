@@ -974,9 +974,15 @@
                         // Extract base64 from background-image style
                         const bgImage = box.style.backgroundImage;
                         if (bgImage) {
-                            // Extract the base64 data from url("data:image/jpeg;base64,...")
-                            const base64Data = bgImage.replace(/^url\("data:image\/[^;]+;base64,/, '').replace(/"\)$/, '');
-                            imageAttachments.push(base64Data);
+                            try {
+                                // Extract the base64 data from url("data:image/jpeg;base64,...")
+                                const base64Match = bgImage.match(/data:image\/[^;]+;base64,([^"]+)/);
+                                if (base64Match && base64Match[1]) {
+                                    imageAttachments.push(base64Match[1]);
+                                }
+                            } catch (err) {
+                                console.error('Error processing image:', err);
+                            }
                         }
                     }
                     
@@ -992,7 +998,7 @@
                         pickup_address: finalData.pickup_address || '',
                         delivery_address: finalData.delivery_address || '',
                         message: messageContent || '',
-                        // Add all images as separate parameters
+                        // Add all images as separate parameters with proper data URL format
                         image1: imageAttachments[0] ? `data:image/jpeg;base64,${imageAttachments[0]}` : '',
                         image2: imageAttachments[1] ? `data:image/jpeg;base64,${imageAttachments[1]}` : '',
                         image3: imageAttachments[2] ? `data:image/jpeg;base64,${imageAttachments[2]}` : ''
@@ -1017,8 +1023,10 @@
                     console.log('Email sent successfully:', response);
                     alert('Hvala! Vaš zahtev je uspešno poslat. Kontaktiraćemo vas uskoro.');
                     
-                    // Redirect to main page after successful submission
-                    window.location.href = '/';
+                    // Add a small delay before redirecting
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1500);
                     
                 } catch (error) {
                     console.error('Failed to send email:', error);
