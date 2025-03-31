@@ -971,6 +971,7 @@
                         pickup_address: formData.get('pickup_address') || '',
                         delivery_address: formData.get('delivery_address') || '',
                         message: formatEmailContent(Object.fromEntries(formData)),
+                        has_images: false,
                         image1: '',
                         image2: '',
                         image3: ''
@@ -978,6 +979,7 @@
 
                     // Process up to 3 images if they exist
                     if (imageInput && imageInput.files.length > 0) {
+                        templateParams.has_images = true;
                         const maxImages = Math.min(imageInput.files.length, 3);
                         for (let i = 0; i < maxImages; i++) {
                             const file = imageInput.files[i];
@@ -985,6 +987,14 @@
                             templateParams[`image${i + 1}`] = base64;
                         }
                     }
+
+                    console.log('Sending email with parameters:', {
+                        ...templateParams,
+                        has_images: templateParams.has_images,
+                        image1: templateParams.image1 ? 'Image 1 present' : 'No image 1',
+                        image2: templateParams.image2 ? 'Image 2 present' : 'No image 2',
+                        image3: templateParams.image3 ? 'Image 3 present' : 'No image 3'
+                    });
 
                     // Send email
                     const response = await emailjs.send(
