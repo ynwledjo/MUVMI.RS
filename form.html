@@ -978,30 +978,29 @@
                     to_name: "Muvmi Tim",
                     from_name: finalData.name,
                     from_phone: '+381 ' + finalData.phone,
-                    category: window.moveData.category, // Use the original category from URL
+                    category: window.moveData.category,
                     pickup_address: finalData.pickup_address,
                     delivery_address: finalData.delivery_address,
                     message: messageContent,
-                    reply_to: "djole.gajic.mes@gmail.com" // Add your email here
+                    reply_to: finalData.email || "your-default-email@example.com" // Add a default email or remove if not needed
                 };
-
-                console.log('Sending email with params:', templateParams); // Debug log
 
                 // Send email using EmailJS
                 emailjs.send('service_jmhj8ye', 'template_j8ve8v6', templateParams)
                     .then(function(response) {
                         console.log('SUCCESS!', response.status, response.text);
-                        alert('Vaš zahtev je uspešno poslat! Kontaktiraćemo vas uskoro.');
-                        window.location.href = 'main.html';
+                        // Show success message to user
+                        alert('Hvala! Vaš zahtev je uspešno poslat. Kontaktiraćemo vas uskoro.');
+                        // Redirect to main page after successful submission
+                        setTimeout(() => {
+                            window.location.href = 'main.html';
+                        }, 1500);
                     })
                     .catch(function(error) {
                         console.error('FAILED...', error);
-                        console.error('Error details:', {
-                            serviceID: 'service_jmhj8ye',
-                            templateID: 'template_j8ve8v6',
-                            params: templateParams
-                        });
-                        alert('Došlo je do greške prilikom slanja zahteva. Molimo pokušajte ponovo.');
+                        // Show error message to user
+                        alert('Došlo je do greške. Molimo pokušajte ponovo ili nas kontaktirajte direktno.');
+                        // Reset button state
                         submitButton.disabled = false;
                         submitButton.textContent = originalButtonText;
                     });
