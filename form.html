@@ -962,42 +962,29 @@
                 try {
                     const formData = new FormData(e.target);
                     const imageInput = e.target.querySelector('input[type="file"]');
-                    let imageBase64Array = [];
                     
-                    // Process images if they exist
-                    if (imageInput && imageInput.files.length > 0) {
-                        const maxImages = Math.min(imageInput.files.length, 20);
-                        for (let i = 0; i < maxImages; i++) {
-                            const file = imageInput.files[i];
-                            const base64 = await compressAndConvertToBase64(file);
-                            imageBase64Array.push(base64);
-                        }
-                    }
-
-                    // Create template parameters with numbered images
+                    // Basic template parameters without images first
                     const templateParams = {
                         to_name: "Muvmi Tim",
                         from_name: formData.get('name') || '',
                         from_phone: '+381 ' + (formData.get('phone') || ''),
                         pickup_address: formData.get('pickup_address') || '',
                         delivery_address: formData.get('delivery_address') || '',
-                        message: formatEmailContent(Object.fromEntries(formData))
+                        message: formatEmailContent(Object.fromEntries(formData)),
+                        image1: '',
+                        image2: '',
+                        image3: ''
                     };
 
-                    // Add numbered images to template params
-                    imageBase64Array.forEach((base64, index) => {
-                        templateParams[`image_${index + 1}`] = base64;
-                    });
-
-                    // Add image count
-                    templateParams.image_count = imageBase64Array.length;
-                    
-                    console.log('Sending email with parameters:', {
-                        ...templateParams,
-                        image_1: templateParams.image_1 ? 'Image 1 exists' : 'No image 1',
-                        image_2: templateParams.image_2 ? 'Image 2 exists' : 'No image 2',
-                        // ... hide actual base64 data from console
-                    });
+                    // Process up to 3 images if they exist
+                    if (imageInput && imageInput.files.length > 0) {
+                        const maxImages = Math.min(imageInput.files.length, 3);
+                        for (let i = 0; i < maxImages; i++) {
+                            const file = imageInput.files[i];
+                            const base64 = await compressAndConvertToBase64(file);
+                            templateParams[`image${i + 1}`] = base64;
+                        }
+                    }
 
                     // Send email
                     const response = await emailjs.send(
@@ -1344,8 +1331,8 @@ Detalji zahteva:
                         let width = img.width;
                         let height = img.height;
                         
-                        // Max dimensions
-                        const MAX_SIZE = 800;
+                        // More aggressive max size
+                        const MAX_SIZE = 600;
                         if (width > height) {
                             if (width > MAX_SIZE) {
                                 height *= MAX_SIZE / width;
@@ -1362,6 +1349,8 @@ Detalji zahteva:
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
+                        // More aggressive compression
+                        resolve(canvas.toDataURL('image/jpeg', 0.5));
                         resolve(canvas.toDataURL('image/jpeg', 0.7));
                     };
                     img.onerror = reject;
