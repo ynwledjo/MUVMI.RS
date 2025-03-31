@@ -961,65 +961,82 @@
                 submitButton.textContent = 'Slanje...';
                 
                 try {
-                    // Collect form data
+                    // Basic form data
                     const formData = new FormData(e.target);
                     const details = Object.fromEntries(formData);
-                    const finalData = { ...window.moveData, ...details };
-                    
-                    // Get all images from image boxes
-                    const imageBoxes = document.querySelectorAll('.image-upload-box.has-image');
-                    let images = [];
-                    
-                    // Collect all images
-                    imageBoxes.forEach((box, index) => {
-                        const backgroundImage = box.style.backgroundImage;
-                        if (backgroundImage) {
-                            // Extract base64 data directly from background-image
-                            const base64 = backgroundImage
-                                .replace('url("', '')
-                                .replace('")', '');
-                            images.push(base64);
-                        }
-                    });
                     
                     // Format the message content
-                    const messageContent = formatEmailContent(finalData);
-                    
-                    // Prepare template parameters
-                    const templateParams = {
-                        to_name: "Muvmi Tim",
-                        from_name: finalData.name || '',
-                        from_phone: '+381 ' + (finalData.phone || ''),
-                        category: window.moveData.category || '',
-                        pickup_address: finalData.pickup_address || '',
-                        delivery_address: finalData.delivery_address || '',
-                        message: messageContent || '',
-                        images: images // Send all images as an array
-                    };
-                    
-                    console.log('Sending email with images count:', images.length);
-                    
-                    // Send email using EmailJS
+                    const messageContent = formatEmailContent({
+                        ...window.moveData,
+                        ...details
+                    });
+
+                    // Get all image URLs from the boxes
+                    const imageUrls = [];
+                    document.querySelectorAll('.image-upload-box.has-image').forEach(box => {
+                        const bgImage = box.style.backgroundImage;
+                        if (bgImage) {
+                            const url = bgImage.slice(5, -2); // Remove 'url("' and '")'
+                            imageUrls.push(url);
+                        }
+                    });
+
+                    // Log the data being sent
+                    console.log('Sending form with:', {
+                        name: details.name,
+                        phone: details.phone,
+                        category: window.moveData.category,
+                        imageCount: imageUrls.length
+                    });
+
+                    // Send email
                     const response = await emailjs.send(
                         'service_jmhj8ye',
                         'template_j8ve8v6',
-                        templateParams,
+                        {
+                            to_name: 'Muvmi Tim',
+                            from_name: details.name,
+                            from_phone: '+381 ' + details.phone,
+                            category: window.moveData.category,
+                            pickup_address: details.pickup_address,
+                            delivery_address: details.delivery_address,
+                            message: messageContent,
+                            images: imageUrls
+                        },
                         'Psdc4pgmrFBYDPM_8'
                     );
-                    
+
                     console.log('Email sent successfully:', response);
                     alert('Hvala! Vaš zahtev je uspešno poslat. Kontaktiraćemo vas uskoro.');
                     
-                    // Redirect to main page after successful submission
+                    // Redirect after a short delay
                     setTimeout(() => {
                         window.location.href = '/';
                     }, 1500);
                     
                 } catch (error) {
-                    console.error('Failed to send email:', error);
-                    alert('Došlo je do greške. Molimo pokušajte ponovo ili nas kontaktirajte direktno.');
+                    // Detailed error logging
+                    console.error('Form submission error:', {
+                        message: error.message,
+                        stack: error.stack,
+                        name: error.name
+                    });
+
+                    // Show a more specific error message
+                    let errorMessage = 'Došlo je do greške. ';
+                    if (error.message.includes('Network') || error.message.includes('Failed to fetch')) {
+                        errorMessage += 'Proverite internet konekciju.';
+                    } else if (error.message.includes('timeout')) {
+                        errorMessage += 'Server nije odgovorio na vreme.';
+                    } else if (error.message.includes('413') || error.message.includes('too large')) {
+                        errorMessage += 'Slike su prevelike. Molimo smanjite njihovu veličinu.';
+                    } else {
+                        errorMessage += 'Molimo pokušajte ponovo za nekoliko minuta.';
+                    }
                     
-                    // Reset button state
+                    alert(errorMessage);
+                    
+                    // Reset button
                     submitButton.disabled = false;
                     submitButton.textContent = 'Pošalji zahtev';
                 }
