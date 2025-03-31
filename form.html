@@ -961,10 +961,17 @@
                 // Create a new FormData object for submission
                 const submitFormData = new FormData();
                 
-                // Add all text fields
+                // Add all text fields with proper encoding
                 Object.entries(finalData).forEach(([key, value]) => {
                     if (key !== 'images') {
-                        submitFormData.append(key, value);
+                        // Convert value to string and encode special characters
+                        const encodedValue = String(value)
+                            .replace(/&/g, '&amp;')
+                            .replace(/</g, '&lt;')
+                            .replace(/>/g, '&gt;')
+                            .replace(/"/g, '&quot;')
+                            .replace(/'/g, '&#039;');
+                        submitFormData.append(key, encodedValue);
                     }
                 });
                 
@@ -976,10 +983,10 @@
                     });
                 }
                 
-                // Add category information
-                submitFormData.append('category', finalData.category);
-                submitFormData.append('pickup', finalData.pickup);
-                submitFormData.append('delivery', finalData.delivery);
+                // Add category information with proper encoding
+                submitFormData.append('category', String(finalData.category || '').replace(/[^a-zA-Z0-9]/g, '_'));
+                submitFormData.append('pickup', String(finalData.pickup || '').replace(/[^a-zA-Z0-9]/g, '_'));
+                submitFormData.append('delivery', String(finalData.delivery || '').replace(/[^a-zA-Z0-9]/g, '_'));
                 
                 // Show loading state
                 const submitBtn = e.target.querySelector('button[type="submit"]');
@@ -987,10 +994,13 @@
                 submitBtn.textContent = 'Slanje...';
                 submitBtn.disabled = true;
                 
-                // Submit to FormSubmit
+                // Submit to FormSubmit with proper headers
                 fetch('https://formsubmit.co/djole.gajic.mes@gmail.com', {
                     method: 'POST',
-                    body: submitFormData
+                    body: submitFormData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
                 })
                 .then(response => {
                     if (response.ok) {
