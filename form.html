@@ -483,6 +483,8 @@
             concrete: [
                 { type: 'text', name: 'description', label: 'Ukratko opišite šta premeštate', fullWidth: true },
                 { type: 'number', name: 'quantity', label: 'Količina (m³)' },
+                { type: 'select', name: 'packaging_type', label: 'Šut je upakovan u',
+                  options: ['Džakove', 'Kontejner', 'Na gomili (potreban utovar)'] },
                 { type: 'select', name: 'concrete_type', label: 'Vrsta betona',
                   options: ['Standardni', 'Armirani', 'Specijalni'] },
                 { type: 'select', name: 'loading_help_needed', label: 'Da li je potreban utovar',
