@@ -414,7 +414,7 @@
                     </a>
                 </div>
             </div>
-            <form id="details-form">
+            <form id="details-form" enctype="multipart/form-data">
                 <!-- Add address fields at the top -->
                 <div class="form-grid">
                     <div class="form-field">
@@ -949,21 +949,7 @@
             formContainer.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
-                const formData = new FormData();
-                
-                // Add all form fields to FormData
-                const formFields = e.target.querySelectorAll('input:not([type="file"]), select, textarea');
-                formFields.forEach(field => {
-                    formData.append(field.name, field.value);
-                });
-                
-                // Add files from the stored Map
-                const fileInput = e.target.querySelector('input[type="file"]');
-                if (fileInput && window.selectedFiles) {
-                    window.selectedFiles.forEach((file, index) => {
-                        formData.append(`image${index}`, file);
-                    });
-                }
+                const formData = new FormData(e.target);
                 
                 // Add category to form data
                 formData.append('Category', category);
@@ -974,35 +960,35 @@
                     formData.set('specific_date', specificDateInput.getAttribute('data-formatted-date'));
                 }
                 
-                // Add this just before the fetch call
-                console.log('Selected files:', window.selectedFiles);
-                console.log('FormData contents:');
-                for (let pair of formData.entries()) {
-                    if (pair[1] instanceof File) {
-                        console.log(pair[0], 'File:', pair[1].name, pair[1].size, 'bytes');
-                    } else {
-                        console.log(pair[0], pair[1]);
+                // Get all files from the file input
+                const fileInput = e.target.querySelector('input[type="file"]');
+                if (fileInput && fileInput.files.length > 0) {
+                    // Append each file with a unique name
+                    for (let i = 0; i < fileInput.files.length; i++) {
+                        formData.append('attachment', fileInput.files[i]);
                     }
                 }
                 
                 try {
-                    // Debug log before sending
+                    // Debug log
+                    console.log('Files being uploaded:', fileInput ? fileInput.files : 'No files');
                     for (let pair of formData.entries()) {
-                        console.log(pair[0] + ': ' + pair[1]);
+                        if (pair[1] instanceof File) {
+                            console.log('File in FormData:', pair[0], pair[1].name, pair[1].size, 'bytes');
+                        }
                     }
                     
                     const response = await fetch(formContainer.action, {
                         method: 'POST',
-                        body: formData,
-                        headers: {
-                            'Accept': 'application/json'
-                        }
+                        body: formData
                     });
                     
                     if (response.ok) {
                         alert('Vaš zahtev je uspešno poslat! Uskoro ćemo vas kontaktirati.');
                         window.location.href = 'main.html';
                     } else {
+                        const errorText = await response.text();
+                        console.error('Server response:', errorText);
                         throw new Error('Submission failed');
                     }
                 } catch (error) {
@@ -1127,7 +1113,7 @@
                 const hiddenInput = document.createElement('input');
                 hiddenInput.type = 'file';
                 hiddenInput.className = 'hidden-file-input';
-                hiddenInput.name = 'images';
+                hiddenInput.name = 'attachment'; // Changed to 'attachment'
                 hiddenInput.multiple = true;
                 hiddenInput.accept = 'image/*';
                 hiddenInput.required = field.required !== false;
@@ -1140,12 +1126,29 @@
                 const uploadBox = createImageUploadBox(hiddenInput, container);
                 container.appendChild(uploadBox);
                 
-                // Store selected files
-                window.selectedFiles = new Map();
-                
                 // Add the container and hidden input to the field div
                 fieldDiv.appendChild(container);
                 fieldDiv.appendChild(hiddenInput);
+                
+                // Handle file selection
+                hiddenInput.addEventListener('change', function() {
+                    if (this.files && this.files.length > 0) {
+                        // Clear existing preview boxes
+                        container.innerHTML = '';
+                        
+                        // Create preview for each selected file
+                        Array.from(this.files).forEach(file => {
+                            const newBox = document.createElement('div');
+                            newBox.className = 'image-upload-box has-image';
+                            displayImageInBox(file, newBox, container, hiddenInput);
+                            container.appendChild(newBox);
+                        });
+                        
+                        // Add empty upload box at the end
+                        const emptyBox = createEmptyUploadBox(hiddenInput, container);
+                        container.appendChild(emptyBox);
+                    }
+                });
                 
                 return fieldDiv;
             } else {
@@ -1260,36 +1263,22 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 box.style.backgroundImage = `url(${e.target.result})`;
-                box.classList.add('has-image');
-                box.dataset.file = file.name; // Store the file name for reference
                 
                 // Add remove button
                 const removeBtn = document.createElement('div');
                 removeBtn.className = 'remove-btn';
                 removeBtn.textContent = '×';
-                box.appendChild(removeBtn);
-                
-                // Handle remove button click
-                removeBtn.addEventListener('click', function(e) {
+                removeBtn.onclick = function(e) {
                     e.stopPropagation();
-                    
-                    // Remove file from stored files
-                    if (window.selectedFiles) {
-                        window.selectedFiles.delete(file.name);
-                    }
-                    
                     box.remove();
                     
-                    // Check if we need to add an empty box
-                    const emptyBoxExists = Array.from(container.children).some(
-                        child => child.classList.contains('image-upload-box') && !child.classList.contains('has-image')
-                    );
-                    
-                    if (!emptyBoxExists) {
-                        const newEmptyBox = createEmptyUploadBox(hiddenInput, container);
-                        container.appendChild(newEmptyBox);
+                    // If no preview boxes left, add empty upload box
+                    if (!container.querySelector('.image-upload-box:not(.empty)')) {
+                        const emptyBox = createEmptyUploadBox(hiddenInput, container);
+                        container.appendChild(emptyBox);
                     }
-                });
+                };
+                box.appendChild(removeBtn);
             };
             reader.readAsDataURL(file);
         }
