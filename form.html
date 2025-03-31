@@ -970,7 +970,8 @@
                         from_phone: '+381 ' + (formData.get('phone') || ''),
                         pickup_address: formData.get('pickup_address') || '',
                         delivery_address: formData.get('delivery_address') || '',
-                        message: formatEmailContent(Object.fromEntries(formData))
+                        message: formatEmailContent(Object.fromEntries(formData)),
+                        images: [] // Initialize empty array for images
                     };
 
                     // Process images if they exist
@@ -981,20 +982,16 @@
                         for (let i = 0; i < maxImages; i++) {
                             try {
                                 const base64String = await fileToBase64(files[i]);
-                                // Add each image as a separate parameter
-                                templateParams[`image_${i + 1}`] = base64String;
+                                templateParams.images.push(base64String);
                             } catch (error) {
                                 console.error('Error processing image:', error);
                             }
                         }
-                        
-                        // Add the number of images
-                        templateParams.image_count = maxImages;
                     }
 
                     console.log('Sending email with parameters:', {
                         ...templateParams,
-                        image_count: templateParams.image_count || 0
+                        image_count: templateParams.images.length
                     });
 
                     // Send email
