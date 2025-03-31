@@ -1056,12 +1056,13 @@
                     unloading_help_needed: finalData.unloading_help_needed || 'Nije navedeno',
                     
                     // Images
-                    has_images: imageArray.length > 0 ? 'Da' : 'Ne',
-                    attachments: attachments
+                    has_images: imageArray.length > 0 ? 'Da' : 'Ne'
                 };
                 
-                // Send email using EmailJS
-                emailjs.send('service_jmhj8ye', 'template_j8ve8v6', templateParams)
+                // Send email using EmailJS with attachments
+                emailjs.send('service_jmhj8ye', 'template_j8ve8v6', templateParams, {
+                    attachments: attachments
+                })
                     .then(function(response) {
                         // Show success message
                         alert('Vaš zahtev je uspešno poslat! Kontaktiraćemo vas uskoro.');
