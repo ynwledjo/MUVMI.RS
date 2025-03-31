@@ -409,7 +409,7 @@
                     <p>Pomožite nam da razumemo vaše potrebe kako bismo dobili tačne ponude</p>
                 </div>
                 <div class="logo">
-                    <a href="index.html">
+                    <a href="https://muvmi.rs">
                         <img src="IMAGES/muvmi-logo.webp" alt="Muvmi">
                     </a>
                 </div>
@@ -436,9 +436,14 @@
         const formConfigs = {
             furniture: [
                 { type: 'text', name: 'description', label: 'Ukratko opišite šta premeštate', fullWidth: true },
+                
                 { type: 'select', name: 'largest_item_size', label: 'Veličina najvećeg predmeta',
                   options: ['Mali (stane u auto)', 'Srednji (stane u kombi)', 'Veliki (zahteva kamion)'] },
                 { type: 'number', name: 'item_count', label: 'Broj predmeta' },
+                { type: 'select', name: 'assembly_needed', label: 'Da li je potrebna demontaža',
+                  options: ['Ne', 'Da'] },
+                { type: 'select', name: 'disassembly_needed', label: 'Da li je potrebna montaža',
+                  options: ['Ne', 'Da'] },
                 { type: 'number', name: 'pickup_floor', label: 'Sprat (mesto utovara)' },
                 { type: 'number', name: 'delivery_floor', label: 'Sprat (mesto istovara)' },
                 { type: 'select', name: 'has_elevator_pickup', label: 'Da li zgrada ima lift (mesto utovara)',
@@ -457,13 +462,50 @@
                 { type: 'select', name: 'moving_date', label: 'Datum',
                   options: ['Hitno', 'U toku nedelje', 'Izaberite datum', 'Još uvek ne znam datum'] },
             ],
+            construction_materials: [
+                { type: 'text', name: 'description', label: 'Ukratko opišite šta premeštate', fullWidth: true },
+                { type: 'select', name: 'material_type', label: 'Vrsta materijala',
+                  options: ['Cigle', 'Beton', 'Armatura', 'Drvo', 'Krovni materijal', 'Ostalo'] },
+                { type: 'text', name: 'other_material_type', label: 'Ostalo (molimo navedite)', hidden: true, depends: { field: 'material_type', value: 'ostalo' } },
+                { type: 'number', name: 'quantity', label: 'Količina' },
+                { type: 'select', name: 'unit', label: 'Jedinica mere',
+                  options: ['Komad', 'Kilogram', 'Metar', 'Kubni metar', 'Paleta'] },
+                { type: 'select', name: 'loading_help_needed', label: 'Da li je potreban utovar',
+                  options: ['Da', 'Ne'] },
+                { type: 'select', name: 'location_accessibility', label: 'Pristupačnost lokacije',
+                  options: ['Lako dostupno', 'Uska ulica', 'Privatno dvorište', 'Otežan prilaz'] },
+                { type: 'text', name: 'parking_info', label: 'Parking info' },
+                { type: 'image_upload', name: 'images', label: 'Slike (Preporučeno!)', required: false },
+                { type: 'select', name: 'moving_date', label: 'Datum',
+                  options: ['Hitno', 'U toku nedelje', 'Izaberite datum', 'Još uvek ne znam datum'] },
+                { type: 'textarea', name: 'notes', label: 'Napomene (specifični uslovi, ograničenje pristupa...)', fullWidth: true, required: false }
+            ],
+            concrete: [
+                { type: 'text', name: 'description', label: 'Ukratko opišite šta premeštate', fullWidth: true },
+                { type: 'number', name: 'quantity', label: 'Količina (m³)' },
+                { type: 'select', name: 'packaging_type', label: 'Šut je upakovan u',
+                  options: ['Džakove', 'Kontejner', 'Na gomili (potreban utovar)'] },
+                { type: 'select', name: 'concrete_type', label: 'Vrsta betona',
+                  options: ['Standardni', 'Armirani', 'Specijalni'] },
+                { type: 'select', name: 'loading_help_needed', label: 'Da li je potreban utovar',
+                  options: ['Da', 'Ne'] },
+                { type: 'select', name: 'location_accessibility', label: 'Pristupačnost lokacije',
+                  options: ['Lako dostupno', 'Uska ulica', 'Privatno dvorište', 'Otežan prilaz'] },
+                { type: 'text', name: 'parking_info', label: 'Parking info' },
+                { type: 'image_upload', name: 'images', label: 'Slike (Preporučeno!)', required: false },
+                { type: 'select', name: 'moving_date', label: 'Datum',
+                  options: ['Hitno', 'U toku nedelje', 'Izaberite datum', 'Još uvek ne znam datum'] },
+                { type: 'textarea', name: 'notes', label: 'Napomene (specifični uslovi, ograničenje pristupa...)', fullWidth: true, required: false }
+            ],
             boxes: [
                 { type: 'text', name: 'description', label: 'Ukratko opišite šta premeštate', fullWidth: true },
                 { type: 'number', name: 'box_count', label: 'Broj kutija' },
-                { type: 'select', name: 'box_sizes', label: 'Veličine kutija',
-                  options: ['Male', 'Srednje', 'Velike'] },
+                { type: 'select', name: 'box_sizes', label: 'Težina kutija',
+                  options: ['Laka (do 5 kg)', 'Srednja (5-15 kg)', 'Teška (15+ kg)'] },
                 { type: 'select', name: 'handling', label: 'Potrebno rukovanje',
                   options: ['Standardno', 'Pažljivo', 'Specijalno'] },
+                { type: 'select', name: 'contains_fragile', label: 'Da li kutije sadrže lomljive predmete',
+                  options: ['Ne', 'Da'] },
                 { type: 'text', name: 'special_handling_equipment', label: 'Oprema za specijalno rukovanje', hidden: true, depends: { field: 'handling', value: 'specijalno' } },
                 { type: 'select', name: 'loading_help', label: 'Potrebna pomoć oko utovara',
                   options: ['Da', 'Ne'] },
@@ -670,7 +712,7 @@
                 showCategoryForm(category);
             } else {
                 // If no parameters, redirect back to main page
-                window.location.href = 'index.html';
+                window.location.href = 'https://muvmi.rs';
             }
         });
 
@@ -821,7 +863,7 @@
             homeLinkDiv.style.marginTop = '-10px';
             homeLinkDiv.style.marginBottom = '20px';
             const homeLink = document.createElement('a');
-            homeLink.href = 'index.html';
+            homeLink.href = 'https://muvmi.rs';
             homeLink.textContent = 'Povratak na početnu';
             homeLink.style.color = 'var(--text-light)';
             homeLink.style.textDecoration = 'none';
@@ -867,7 +909,7 @@
             });
 
             modal.querySelector('.proceed').addEventListener('click', function() {
-                window.location.href = 'index.html';
+                window.location.href = 'https://muvmi.rs';
             });
 
             // Close modal when clicking outside
