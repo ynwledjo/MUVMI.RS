@@ -399,8 +399,6 @@
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Add EmailJS SDK -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -950,6 +948,7 @@
                 // Handle the date format properly
                 const specificDateInput = e.target.querySelector('input[name="specific_date"]');
                 if (specificDateInput && specificDateInput.getAttribute('data-formatted-date')) {
+                    // Use the formatted date in dd/mm/yyyy format
                     formData.set('specific_date', specificDateInput.getAttribute('data-formatted-date'));
                 }
                 
@@ -957,122 +956,8 @@
                 
                 // Combine with initial data
                 const finalData = { ...window.moveData, ...details };
-                
-                // Initialize EmailJS with your public key
-                emailjs.init("Psdc4pgmrFBYDPM_8");
-                
-                // Get all uploaded images
-                const imageInput = e.target.querySelector('input[name="images"]');
-                const imageFiles = imageInput ? imageInput.files : [];
-                
-                // Convert FileList to Array for easier handling
-                const imageArray = Array.from(imageFiles);
-                
-                // Create attachments array for EmailJS
-                const attachments = imageArray.map((file, index) => ({
-                    filename: `image_${index + 1}.${file.name.split('.').pop()}`,
-                    content: file,
-                    contentType: file.type
-                }));
-                
-                // Organize data into sections for better email formatting
-                const templateParams = {
-                    // Basic Information
-                    category: finalData.category,
-                    pickup_address: finalData.pickup_address,
-                    delivery_address: finalData.delivery_address,
-                    name: finalData.name,
-                    phone: finalData.phone,
-                    
-                    // Description and Details
-                    description: finalData.description || 'Nije navedeno',
-                    additional_details: finalData.additional_details || 'Nije navedeno',
-                    special_instructions: finalData.special_instructions || 'Nije navedeno',
-                    notes: finalData.notes || 'Nije navedeno',
-                    
-                    // Moving Details
-                    moving_date: finalData.moving_date,
-                    specific_date: finalData.specific_date || 'Nije navedeno',
-                    
-                    // Property Details (for moving category)
-                    property_type_pickup: finalData.property_type_pickup || 'Nije navedeno',
-                    property_type_delivery: finalData.property_type_delivery || 'Nije navedeno',
-                    number_of_rooms: finalData.number_of_rooms || 'Nije navedeno',
-                    
-                    // Access and Location Details
-                    pickup_floor: finalData.pickup_floor || 'Nije navedeno',
-                    delivery_floor: finalData.delivery_floor || 'Nije navedeno',
-                    has_elevator_pickup: finalData.has_elevator_pickup || 'Nije navedeno',
-                    has_elevator_delivery: finalData.has_elevator_delivery || 'Nije navedeno',
-                    pickup_access: finalData.pickup_access || 'Nije navedeno',
-                    delivery_access: finalData.delivery_access || 'Nije navedeno',
-                    parking_info_pickup: finalData.parking_info_pickup || 'Nije navedeno',
-                    parking_info_delivery: finalData.parking_info_delivery || 'Nije navedeno',
-                    
-                    // Furniture Specific
-                    largest_item_size: finalData.largest_item_size || 'Nije navedeno',
-                    item_count: finalData.item_count || 'Nije navedeno',
-                    
-                    // Boxes Specific
-                    box_count: finalData.box_count || 'Nije navedeno',
-                    box_sizes: finalData.box_sizes || 'Nije navedeno',
-                    
-                    // Cargo Specific
-                    cargo_description: finalData.cargo_description || 'Nije navedeno',
-                    packaging_description: finalData.packaging_description || 'Nije navedeno',
-                    dimensions: finalData.dimensions || 'Nije navedeno',
-                    total_weight: finalData.total_weight || 'Nije navedeno',
-                    loading_equipment: finalData.loading_equipment || 'Nije navedeno',
-                    unloading_equipment: finalData.unloading_equipment || 'Nije navedeno',
-                    
-                    // Vehicle Specific
-                    make: finalData.make || 'Nije navedeno',
-                    model: finalData.model || 'Nije navedeno',
-                    drivable: finalData.drivable || 'Nije navedeno',
-                    transport_method: finalData.transport_method || 'Nije navedeno',
-                    
-                    // Animal Specific
-                    breed: finalData.breed || 'Nije navedeno',
-                    weight: finalData.weight || 'Nije navedeno',
-                    vaccines: finalData.vaccines || 'Nije navedeno',
-                    transport_cage: finalData.transport_cage || 'Nije navedeno',
-                    cage_length: finalData.cage_length || 'Nije navedeno',
-                    cage_width: finalData.cage_width || 'Nije navedeno',
-                    cage_height: finalData.cage_height || 'Nije navedeno',
-                    special_needs: finalData.special_needs || 'Nije navedeno',
-                    special_needs_description: finalData.special_needs_description || 'Nije navedeno',
-                    
-                    // Construction Waste Specific
-                    waste_type: finalData.waste_type || 'Nije navedeno',
-                    other_waste_type: finalData.other_waste_type || 'Nije navedeno',
-                    waste_volume: finalData.waste_volume || 'Nije navedeno',
-                    location_accessibility: finalData.location_accessibility || 'Nije navedeno',
-                    
-                    // Help and Handling
-                    handling: finalData.handling || 'Nije navedeno',
-                    loading_help: finalData.loading_help || 'Nije navedeno',
-                    unloading_help: finalData.unloading_help || 'Nije navedeno',
-                    loading_help_needed: finalData.loading_help_needed || 'Nije navedeno',
-                    unloading_help_needed: finalData.unloading_help_needed || 'Nije navedeno',
-                    
-                    // Images
-                    has_images: imageArray.length > 0 ? 'Da' : 'Ne'
-                };
-                
-                // Send email using EmailJS with attachments
-                emailjs.send('service_jmhj8ye', 'template_j8ve8v6', templateParams, {
-                    attachments: attachments
-                })
-                    .then(function(response) {
-                        // Show success message
-                        alert('Vaš zahtev je uspešno poslat! Kontaktiraćemo vas uskoro.');
-                        // Redirect to main page
-                        window.location.href = 'main.html';
-                    }, function(error) {
-                        // Show error message
-                        alert('Došlo je do greške prilikom slanja zahteva. Molimo pokušajte ponovo.');
-                        console.error('EmailJS error:', error);
-                    });
+                console.log('Final form data:', finalData);
+                // Here you would typically send this data to your server
             });
         }
 
