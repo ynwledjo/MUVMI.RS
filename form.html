@@ -1007,8 +1007,30 @@
                 
                 const details = Object.fromEntries(formData);
                 
+                // Create a formatted details string
+                let detailsString = '';
+                for (const [key, value] of Object.entries(details)) {
+                    // Skip the basic fields that are shown separately
+                    if (!['name', 'phone', 'pickup_address', 'delivery_address', 'category', 'pickup', 'delivery'].includes(key)) {
+                        // Format the key to be more readable
+                        const formattedKey = key
+                            .split('_')
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                            .join(' ');
+                        
+                        detailsString += `${formattedKey}: ${value}\n`;
+                    }
+                }
+                
                 // Combine with initial data
-                const finalData = { ...window.moveData, ...details };
+                const finalData = { 
+                    ...window.moveData, 
+                    name: details.name,
+                    phone: details.phone,
+                    pickup_address: details.pickup_address,
+                    delivery_address: details.delivery_address,
+                    details: detailsString
+                };
                 
                 // Initialize EmailJS
                 emailjs.init("Psdc4pgmrFBYDPM_8");
