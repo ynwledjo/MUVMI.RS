@@ -399,6 +399,7 @@
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -432,6 +433,10 @@
     </div>
 
     <script>
+        (function() {
+            emailjs.init("Psdc4pgmrFBYDPM_8"); // Replace with your EmailJS public key
+        })();
+
         // Form configuration for each category
         const formConfigs = {
             furniture: [
@@ -948,16 +953,43 @@
                 // Handle the date format properly
                 const specificDateInput = e.target.querySelector('input[name="specific_date"]');
                 if (specificDateInput && specificDateInput.getAttribute('data-formatted-date')) {
-                    // Use the formatted date in dd/mm/yyyy format
                     formData.set('specific_date', specificDateInput.getAttribute('data-formatted-date'));
                 }
                 
                 const details = Object.fromEntries(formData);
-                
-                // Combine with initial data
                 const finalData = { ...window.moveData, ...details };
-                console.log('Final form data:', finalData);
-                // Here you would typically send this data to your server
+                
+                // Show loading state
+                const submitButton = e.target.querySelector('button[type="submit"]');
+                const originalButtonText = submitButton.textContent;
+                submitButton.disabled = true;
+                submitButton.textContent = 'Slanje...';
+
+                // Send email using EmailJS
+                emailjs.send(
+                    'service_jmhj8ye', // Replace with your EmailJS service ID
+                    'template_j8ve8v6', // Replace with your EmailJS template ID
+                    {
+                        to_email: 'djole.gajic.mes@gmail.com', // Replace with your email
+                        from_name: finalData.name,
+                        from_phone: '+381 ' + finalData.phone,
+                        category: finalData.category,
+                        pickup_address: finalData.pickup_address,
+                        delivery_address: finalData.delivery_address,
+                        message: formatEmailContent(finalData)
+                    }
+                )
+                .then(function(response) {
+                    console.log('SUCCESS!', response.status, response.text);
+                    alert('Vaš zahtev je uspešno poslat! Kontaktiraćemo vas uskoro.');
+                    window.location.href = 'main.html';
+                })
+                .catch(function(error) {
+                    console.log('FAILED...', error);
+                    alert('Došlo je do greške prilikom slanja zahteva. Molimo pokušajte ponovo.');
+                    submitButton.disabled = false;
+                    submitButton.textContent = originalButtonText;
+                });
             });
         }
 
@@ -1223,6 +1255,42 @@
                 });
             };
             reader.readAsDataURL(file);
+        }
+
+        function formatEmailContent(data) {
+            let content = `
+Novi zahtev za transport
+
+Osnovne informacije:
+-------------------
+Ime: ${data.name}
+Telefon: +381 ${data.phone}
+Kategorija: ${data.category}
+
+Adrese:
+-------
+Adresa preuzimanja: ${data.pickup_address}
+Adresa dostave: ${data.delivery_address}
+
+Detalji zahteva:
+---------------
+`;
+
+            // Add all other form fields
+            for (const [key, value] of Object.entries(data)) {
+                // Skip already included fields
+                if (!['name', 'phone', 'category', 'pickup_address', 'delivery_address'].includes(key)) {
+                    // Format key by replacing underscores with spaces and capitalizing first letter
+                    const formattedKey = key
+                        .split('_')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ');
+                    
+                    content += `${formattedKey}: ${value}\n`;
+                }
+            }
+
+            return content;
         }
     </script>
 </body>
