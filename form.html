@@ -453,7 +453,7 @@
                 { type: 'text', name: 'parking_info_delivery', label: 'Parking info (mesto istovara)' },
                 { type: 'text', name: 'special_instructions', label: 'Specijalne instrukcije (npr. koristite dvorište, pozovite pre nego što stignete...)', fullWidth: true },
                 { type: 'textarea', name: 'additional_details', label: 'Dodatni detalji', fullWidth: true },
-                { type: 'image_upload', name: 'images', label: 'Slike (Strogo preporučeno!)', required: false },
+                { type: 'file', name: 'images', label: 'Slike (Strogo preporučeno!)', required: false },
                 { type: 'select', name: 'moving_date', label: 'Datum',
                   options: ['Hitno', 'U toku nedelje', 'Izaberite datum', 'Još uvek ne znam datum'] },
             ],
@@ -477,7 +477,7 @@
                 { type: 'number', name: 'delivery_floor', label: 'Sprat (mesto istovara)' },
                 { type: 'text', name: 'special_instructions', label: 'Specijalne instrukcije (npr. koristite dvorište, pozovite pre nego što stignete...)', fullWidth: true },
                 { type: 'textarea', name: 'additional_details', label: 'Dodatni detalji', fullWidth: true },
-                { type: 'image_upload', name: 'images', label: 'Slike (Preporučeno!)', required: false },
+                { type: 'file', name: 'images', label: 'Slike (Preporučeno!)', required: false },
                 { type: 'select', name: 'moving_date', label: 'Datum',
                   options: ['Hitno', 'U toku nedelje', 'Izaberite datum', 'Još uvek ne znam datum'] },
             ],
@@ -501,7 +501,7 @@
                   options: ['Da', 'Ne'] },
                 { type: 'select', name: 'unloading_help_needed', label: 'Da li vam je potrebna pomoć pri istovaru?',
                   options: ['Da', 'Ne'] },
-                { type: 'image_upload', name: 'images', label: 'Slike (Preporučeno!)', required: false },
+                { type: 'file', name: 'images', label: 'Slike (Preporučeno!)', required: false },
                 { type: 'text', name: 'special_instructions', label: 'Specijalne instrukcije (npr. koristite dvorište, pozovite pre nego što stignete...)', fullWidth: true },
                 { type: 'textarea', name: 'additional_details', label: 'Dodatni detalji', fullWidth: true },
                 { type: 'select', name: 'moving_date', label: 'Datum',
@@ -518,7 +518,7 @@
                   options: ['Lak pristup', 'Stepenice', 'Lift', 'Otežan pristup'] },
                 { type: 'select', name: 'delivery_access', label: 'Pristup mestu istovara',
                   options: ['Lak pristup', 'Stepenice', 'Lift', 'Otežan pristup'] },
-                { type: 'image_upload', name: 'images', label: 'Slike (Preporučeno!)', required: false },
+                { type: 'file', name: 'images', label: 'Slike (Preporučeno!)', required: false },
                 { type: 'text', name: 'special_instructions', label: 'Specijalne instrukcije (npr. koristite dvorište, pozovite pre nego što stignete...)', fullWidth: true },
                 { type: 'textarea', name: 'additional_details', label: 'Dodatni detalji', fullWidth: true },
                 { type: 'select', name: 'moving_date', label: 'Datum',
@@ -537,7 +537,7 @@
                   options: ['Da', 'Ne'] },
                 { type: 'text', name: 'parking_info_pickup', label: 'Parking info (mesto utovara)' },
                 { type: 'text', name: 'parking_info_delivery', label: 'Parking info (mesto istovara)' },
-                { type: 'image_upload', name: 'images', label: 'Slike (Preporučeno!)', required: false },  
+                { type: 'file', name: 'images', label: 'Slike (Preporučeno!)', required: false },  
                 { type: 'number', name: 'number_of_rooms', label: 'Broj soba' },
                 { type: 'select', name: 'moving_date', label: 'Datum selidbe',
                   options: ['Hitno', 'U toku nedelje', 'Izaberite datum', 'Još uvek ne znam datum'] },
@@ -555,7 +555,7 @@
                   options: ['Lak pristup', 'Stepenice', 'Lift', 'Otežan pristup'] },
                 { type: 'text', name: 'special_instructions', label: 'Specijalne instrukcije (npr. koristite dvorište, pozovite pre nego što stignete...)', fullWidth: true },
                 { type: 'textarea', name: 'additional_details', label: 'Dodatni detalji', fullWidth: true },
-                { type: 'image_upload', name: 'images', label: 'Slike (Preporučeno!)', required: false },
+                { type: 'file', name: 'images', label: 'Slike (Preporučeno!)', required: false },
                 { type: 'select', name: 'moving_date', label: 'Datum',
                   options: ['Hitno', 'U toku nedelje', 'Izaberite datum', 'Još uvek ne znam datum'] },
             ],
@@ -573,7 +573,7 @@
                 { type: 'select', name: 'special_needs', label: 'Da li vaš ljubimac ima specijalne potrebe?',
                   options: ['Ne', 'Da'] },
                 { type: 'text', name: 'special_needs_description', label: 'Specijalne potrebe ljubimca', fullWidth: true, hidden: true, depends: { field: 'special_needs', value: 'da' } },
-                { type: 'image_upload', name: 'images', label: 'Slike (Preporučeno!)', required: false },
+                { type: 'file', name: 'images', label: 'Slike (Preporučeno!)', required: false },
                 { type: 'select', name: 'moving_date', label: 'Datum',
                   options: ['Hitno', 'U toku nedelje', 'Izaberite datum', 'Još uvek ne znam datum'] },
             ],
@@ -581,7 +581,7 @@
                 { type: 'text', name: 'description', label: 'Ukratko opišite šta premeštate', fullWidth: true },
                 { type: 'text', name: 'special_instructions', label: 'Specijalne instrukcije (npr. koristite dvorište, pozovite pre nego što stignete...)', fullWidth: true },
                 { type: 'textarea', name: 'additional_details', label: 'Dodatni detalji', fullWidth: true },
-                { type: 'image_upload', name: 'images', label: 'Slike (Preporučeno!)', required: false },
+                { type: 'file', name: 'images', label: 'Slike (Preporučeno!)', required: false },
                 { type: 'select', name: 'moving_date', label: 'Datum',
                   options: ['Hitno', 'U toku nedelje', 'Izaberite datum', 'Još uvek ne znam datum'] },
             ],
@@ -596,7 +596,7 @@
                 { type: 'select', name: 'location_accessibility', label: 'Pristupačnost lokacije',
                   options: ['Lako dostupno', 'Uska ulica', 'Privatno dvorište', 'Otežan prilaz'] },
                 { type: 'text', name: 'parking_info', label: 'Parking info' },
-                { type: 'image_upload', name: 'images', label: 'Slike (Preporučeno!)', required: false },
+                { type: 'file', name: 'images', label: 'Slike (Preporučeno!)', required: false },
                 { type: 'select', name: 'moving_date', label: 'Datum',
                   options: ['Hitno', 'U toku nedelje', 'Izaberite datum', 'Još uvek ne znam datum'] },
                 { type: 'textarea', name: 'notes', label: 'Napomene (specifični uslovi, ograničenje pristupa...)', fullWidth: true, required: false }
@@ -772,13 +772,13 @@
                 // Add fields before images
                 for (let i = 0; i < fieldConfigs.length; i++) {
                     // Skip image_upload and moving_date as they'll be handled separately
-                    if (fieldConfigs[i].type !== 'image_upload' && fieldConfigs[i].name !== 'moving_date') {
+                    if (fieldConfigs[i].type !== 'file' && fieldConfigs[i].name !== 'moving_date') {
                         formGrid.appendChild(createFormField(fieldConfigs[i]));
                     }
                 }
                 
                 // Add image upload (find it in the config)
-                const imageField = fieldConfigs.find(field => field.type === 'image_upload');
+                const imageField = fieldConfigs.find(field => field.type === 'file');
                 if (imageField) {
                     formGrid.appendChild(createFormField(imageField));
                 }
@@ -1208,29 +1208,37 @@
                         }
                     });
                 }
-            } else if (field.type === 'image_upload') {
-                // Create a hidden input for storing the files
-                const hiddenInput = document.createElement('input');
-                hiddenInput.type = 'file';
-                hiddenInput.className = 'hidden-file-input';
-                hiddenInput.name = field.name;
-                hiddenInput.multiple = true;
-                hiddenInput.accept = 'image/*';
-                hiddenInput.required = field.required !== false;
+            } else if (field.type === 'file') {
+                // Create a file input for images
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.name = field.name;
+                fileInput.multiple = true;
+                fileInput.accept = 'image/*';
+                fileInput.required = field.required !== false;
                 
-                // Create container for the upload boxes
-                const container = document.createElement('div');
-                container.className = 'image-upload-container';
+                // Add validation for image files
+                fileInput.addEventListener('change', function() {
+                    const files = this.files;
+                    for (let i = 0; i < files.length; i++) {
+                        if (!files[i].type.startsWith('image/')) {
+                            alert('Molimo izaberite samo slike.');
+                            this.value = '';
+                            return;
+                        }
+                    }
+                });
                 
-                // Create the first upload box with plus icon
-                const uploadBox = createImageUploadBox(hiddenInput, container);
-                container.appendChild(uploadBox);
+                fieldDiv.appendChild(fileInput);
                 
-                // Add the container and hidden input to the field div
-                fieldDiv.appendChild(container);
-                fieldDiv.appendChild(hiddenInput);
+                // Add helper text
+                const helperText = document.createElement('p');
+                helperText.style.fontSize = '12px';
+                helperText.style.color = 'var(--text-light)';
+                helperText.style.marginTop = '4px';
+                helperText.textContent = 'Možete izabrati više slika. Podržani formati: JPG, PNG, GIF';
+                fieldDiv.appendChild(helperText);
                 
-                // Return early as we've already added everything to fieldDiv
                 return fieldDiv;
             } else {
                 input = document.createElement('input');
@@ -1241,125 +1249,6 @@
             
             fieldDiv.appendChild(input);
             return fieldDiv;
-        }
-
-        // Function to create an image upload box
-        function createImageUploadBox(hiddenInput, container) {
-            const box = document.createElement('div');
-            box.className = 'image-upload-box';
-            
-            // Plus icon
-            const plus = document.createElement('span');
-            plus.className = 'plus-icon';
-            plus.textContent = '+';
-            box.appendChild(plus);
-            
-            // Remove button (initially hidden)
-            const removeBtn = document.createElement('div');
-            removeBtn.className = 'remove-btn';
-            removeBtn.textContent = '×';
-            box.appendChild(removeBtn);
-            
-            // Click event to open file dialog
-            box.addEventListener('click', function(e) {
-                if (e.target !== removeBtn) {
-                    hiddenInput.click();
-                }
-            });
-            
-            // Handle file selection
-            hiddenInput.addEventListener('change', function() {
-                if (this.files && this.files.length > 0) {
-                    // Remove existing empty upload box first to prevent duplicates
-                    const emptyBoxes = Array.from(container.querySelectorAll('.image-upload-box:not(.has-image)'));
-                    emptyBoxes.forEach(emptyBox => emptyBox.remove());
-                    
-                    // Process each file
-                    Array.from(this.files).forEach((file, index) => {
-                        // Create a new box for each image
-                        const newBox = document.createElement('div');
-                        newBox.className = 'image-upload-box';
-                        displayImageInBox(file, newBox, container, hiddenInput);
-                        container.appendChild(newBox);
-                    });
-                    
-                    // Always add only one new empty upload box at the end
-                    const newEmptyBox = createEmptyUploadBox(hiddenInput, container);
-                    container.appendChild(newEmptyBox);
-                    
-                    // Clear the input to allow selecting the same files again
-                    hiddenInput.value = '';
-                }
-            });
-            
-            // Handle remove button click
-            removeBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                box.remove();
-                
-                // If no empty box exists, add one
-                const emptyBoxExists = Array.from(container.children).some(
-                    child => child.classList.contains('image-upload-box') && !child.classList.contains('has-image')
-                );
-                
-                if (!emptyBoxExists) {
-                    const newEmptyBox = createEmptyUploadBox(hiddenInput, container);
-                    container.appendChild(newEmptyBox);
-                }
-            });
-            
-            return box;
-        }
-        
-        // Function to create an empty upload box
-        function createEmptyUploadBox(hiddenInput, container) {
-            const box = document.createElement('div');
-            box.className = 'image-upload-box';
-            
-            // Plus icon
-            const plus = document.createElement('span');
-            plus.className = 'plus-icon';
-            plus.textContent = '+';
-            box.appendChild(plus);
-            
-            // Click event to open file dialog
-            box.addEventListener('click', function() {
-                hiddenInput.click();
-            });
-            
-            return box;
-        }
-        
-        // Function to display an image in a box
-        function displayImageInBox(file, box, container, hiddenInput) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                box.style.backgroundImage = `url(${e.target.result})`;
-                box.classList.add('has-image');
-                
-                // Add remove button
-                const removeBtn = document.createElement('div');
-                removeBtn.className = 'remove-btn';
-                removeBtn.textContent = '×';
-                box.appendChild(removeBtn);
-                
-                // Handle remove button click
-                removeBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    box.remove();
-                    
-                    // Check if we need to add an empty box
-                    const emptyBoxExists = Array.from(container.children).some(
-                        child => child.classList.contains('image-upload-box') && !child.classList.contains('has-image')
-                    );
-                    
-                    if (!emptyBoxExists) {
-                        const newEmptyBox = createEmptyUploadBox(hiddenInput, container);
-                        container.appendChild(newEmptyBox);
-                    }
-                });
-            };
-            reader.readAsDataURL(file);
         }
     </script>
 </body>
