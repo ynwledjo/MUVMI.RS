@@ -399,6 +399,7 @@
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -986,14 +987,21 @@
             formContainer.appendChild(formGrid);
             
             // Handle form submission
-            formContainer.addEventListener('submit', function(e) {
+            const form = document.getElementById('details-form');
+            form.addEventListener('submit', function(e) {
                 e.preventDefault();
-                const formData = new FormData(e.target);
+                
+                // Show loading state
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Slanje...';
+                submitBtn.disabled = true;
+                
+                const formData = new FormData(form);
                 
                 // Handle the date format properly
-                const specificDateInput = e.target.querySelector('input[name="specific_date"]');
+                const specificDateInput = form.querySelector('input[name="specific_date"]');
                 if (specificDateInput && specificDateInput.getAttribute('data-formatted-date')) {
-                    // Use the formatted date in dd/mm/yyyy format
                     formData.set('specific_date', specificDateInput.getAttribute('data-formatted-date'));
                 }
                 
@@ -1001,8 +1009,27 @@
                 
                 // Combine with initial data
                 const finalData = { ...window.moveData, ...details };
-                console.log('Final form data:', finalData);
-                // Here you would typically send this data to your server
+                
+                // Initialize EmailJS
+                emailjs.init("Psdc4pgmrFBYDPM_8");
+                
+                // Send email using EmailJS
+                emailjs.send("service_jmhj8ye", "template_j8ve8v6", finalData)
+                    .then(function(response) {
+                        // Show success message
+                        alert("Vaš zahtev je uspešno poslat! Kontaktiraćemo vas uskoro.");
+                        // Redirect to home page
+                        window.location.href = 'https://muvmi.rs';
+                    }, function(error) {
+                        // Show error message
+                        alert("Došlo je do greške prilikom slanja zahteva. Molimo pokušajte ponovo.");
+                        console.error("EmailJS error:", error);
+                    })
+                    .finally(function() {
+                        // Reset button state
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
+                    });
             });
         }
 
