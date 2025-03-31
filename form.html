@@ -963,38 +963,30 @@
                     const formData = new FormData(e.target);
                     const imageInput = e.target.querySelector('input[type="file"]');
                     
-                    // Basic template parameters without images first
+                    // Basic template parameters
                     const templateParams = {
                         to_name: "Muvmi Tim",
                         from_name: formData.get('name') || '',
                         from_phone: '+381 ' + (formData.get('phone') || ''),
                         pickup_address: formData.get('pickup_address') || '',
                         delivery_address: formData.get('delivery_address') || '',
-                        message: formatEmailContent(Object.fromEntries(formData)),
-                        has_images: false,
-                        image1: '',
-                        image2: '',
-                        image3: ''
+                        message: formatEmailContent(Object.fromEntries(formData))
                     };
 
                     // Process up to 3 images if they exist
                     if (imageInput && imageInput.files.length > 0) {
-                        templateParams.has_images = true;
                         const maxImages = Math.min(imageInput.files.length, 3);
                         for (let i = 0; i < maxImages; i++) {
                             const file = imageInput.files[i];
-                            const base64 = await compressAndConvertToBase64(file);
-                            templateParams[`image${i + 1}`] = base64;
+                            try {
+                                const base64 = await compressAndConvertToBase64(file);
+                                // Add each image as a separate parameter with a simple name
+                                templateParams[`img${i + 1}`] = base64;
+                            } catch (error) {
+                                console.error('Error processing image:', error);
+                            }
                         }
                     }
-
-                    console.log('Sending email with parameters:', {
-                        ...templateParams,
-                        has_images: templateParams.has_images,
-                        image1: templateParams.image1 ? 'Image 1 present' : 'No image 1',
-                        image2: templateParams.image2 ? 'Image 2 present' : 'No image 2',
-                        image3: templateParams.image3 ? 'Image 3 present' : 'No image 3'
-                    });
 
                     // Send email
                     const response = await emailjs.send(
@@ -1330,7 +1322,7 @@ Detalji zahteva:
             return content;
         }
 
-        // Helper function to compress images
+        // Update the image compression function to be more aggressive
         async function compressAndConvertToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -1341,8 +1333,8 @@ Detalji zahteva:
                         let width = img.width;
                         let height = img.height;
                         
-                        // More aggressive max size
-                        const MAX_SIZE = 600;
+                        // Even smaller max size
+                        const MAX_SIZE = 400;
                         if (width > height) {
                             if (width > MAX_SIZE) {
                                 height *= MAX_SIZE / width;
@@ -1360,8 +1352,7 @@ Detalji zahteva:
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
                         // More aggressive compression
-                        resolve(canvas.toDataURL('image/jpeg', 0.5));
-                        resolve(canvas.toDataURL('image/jpeg', 0.7));
+                        resolve(canvas.toDataURL('image/jpeg', 0.3));
                     };
                     img.onerror = reject;
                     img.src = e.target.result;
