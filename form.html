@@ -948,27 +948,65 @@
             // Handle form submission
             formContainer.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                const formData = new FormData(e.target);
                 
-                // Add category to form data
-                formData.append('category', window.moveData.category);
-                
-                // Process images before submission
-                const imageInputs = e.target.querySelectorAll('input[type="file"]');
-                imageInputs.forEach((input, index) => {
-                    if (input.files && input.files.length > 0) {
-                        Array.from(input.files).forEach((file, fileIndex) => {
-                            // Append each file with a unique name including category
-                            formData.append(`${input.name}_${fileIndex}`, file);
-                        });
-                    }
-                });
+                const submitButton = e.target.querySelector('button[type="submit"]');
+                submitButton.textContent = 'Slanje...';
+                submitButton.disabled = true;
 
                 try {
-                    const submitButton = e.target.querySelector('button[type="submit"]');
-                    const originalText = submitButton.textContent;
-                    submitButton.textContent = 'Slanje...';
-                    submitButton.disabled = true;
+                    const formData = new FormData(e.target);
+                    
+                    // Add category to form data
+                    formData.append('category', window.moveData.category);
+                    
+                    // Process images
+                    const imageInputs = e.target.querySelectorAll('input[type="file"]');
+                    let imageCount = 0;
+                    
+                    for (const input of imageInputs) {
+                        if (input.files && input.files.length > 0) {
+                            for (const file of input.files) {
+                                // Check file size (max 10MB)
+                                if (file.size > 10 * 1024 * 1024) {
+                                    alert('Slika ne može biti veća od 10MB');
+                                    submitButton.textContent = 'Pošalji zahtev';
+                                    submitButton.disabled = false;
+                                    return;
+                                }
+                                
+                                // Limit to 10 images total
+                                if (imageCount >= 10) {
+                                    alert('Možete poslati maksimalno 10 slika');
+                                    submitButton.textContent = 'Pošalji zahtev';
+                                    submitButton.disabled = false;
+                                    return;
+                                }
+                                
+                                formData.append(`images`, file);
+                                imageCount++;
+                            }
+                        }
+                    }
+
+                    // Add email subject and template
+                    formData.append('subject', `Nova porudžbina - ${window.moveData.category.toUpperCase()}`);
+                    formData.append('from_name', 'Muvmi Website');
+                    
+                    // Create a summary of the form data for better email formatting
+                    let summary = `Category: ${window.moveData.category}\n`;
+                    summary += `Pickup Address: ${formData.get('pickup_address')}\n`;
+                    summary += `Delivery Address: ${formData.get('delivery_address')}\n\n`;
+                    
+                    // Add all other form fields to the summary
+                    for (const [key, value] of formData.entries()) {
+                        if (key !== 'access_key' && key !== 'subject' && key !== 'from_name' && 
+                            key !== 'pickup_address' && key !== 'delivery_address' && 
+                            !key.includes('images')) {
+                            summary += `${key}: ${value}\n`;
+                        }
+                    }
+                    
+                    formData.append('message', summary);
 
                     const response = await fetch('https://api.web3forms.com/submit', {
                         method: 'POST',
@@ -981,14 +1019,11 @@
                         alert('Vaš zahtev je uspešno poslat!');
                         window.location.href = 'main.html';
                     } else {
-                        alert('Došlo je do greške. Molimo pokušajte ponovo.');
-                        submitButton.textContent = originalText;
-                        submitButton.disabled = false;
+                        throw new Error(data.message || 'Submission failed');
                     }
                 } catch (error) {
                     console.error('Error:', error);
                     alert('Došlo je do greške. Molimo pokušajte ponovo.');
-                    const submitButton = e.target.querySelector('button[type="submit"]');
                     submitButton.textContent = 'Pošalji zahtev';
                     submitButton.disabled = false;
                 }
