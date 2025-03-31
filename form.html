@@ -954,67 +954,70 @@
                 submitButton.disabled = true;
 
                 try {
-                    const formData = new FormData(e.target);
+                    const formData = new FormData();
                     
-                    // Add category to form data
+                    // Add the access key
+                    formData.append('access_key', 'd7a51c8c-49a5-4b8e-b9c3-59c745102042');
+                    
+                    // Add basic info
                     formData.append('category', window.moveData.category);
-                    
+                    formData.append('pickup_address', e.target.querySelector('[name="pickup_address"]').value);
+                    formData.append('delivery_address', e.target.querySelector('[name="delivery_address"]').value);
+                    formData.append('name', e.target.querySelector('[name="name"]').value);
+                    formData.append('phone', '+381' + e.target.querySelector('[name="phone"]').value);
+
+                    // Process all form inputs except file inputs
+                    const inputs = e.target.querySelectorAll('input:not([type="file"]), select, textarea');
+                    inputs.forEach(input => {
+                        if (input.name && input.name !== 'access_key') {
+                            formData.append(input.name, input.value);
+                        }
+                    });
+
                     // Process images
-                    const imageInputs = e.target.querySelectorAll('input[type="file"]');
-                    let imageCount = 0;
-                    
-                    for (const input of imageInputs) {
-                        if (input.files && input.files.length > 0) {
-                            for (const file of input.files) {
-                                // Check file size (max 10MB)
-                                if (file.size > 10 * 1024 * 1024) {
-                                    alert('Slika ne može biti veća od 10MB');
-                                    submitButton.textContent = 'Pošalji zahtev';
-                                    submitButton.disabled = false;
-                                    return;
-                                }
-                                
-                                // Limit to 10 images total
-                                if (imageCount >= 10) {
-                                    alert('Možete poslati maksimalno 10 slika');
-                                    submitButton.textContent = 'Pošalji zahtev';
-                                    submitButton.disabled = false;
-                                    return;
-                                }
-                                
-                                formData.append(`images`, file);
-                                imageCount++;
+                    const imageInput = e.target.querySelector('input[type="file"]');
+                    if (imageInput && imageInput.files.length > 0) {
+                        Array.from(imageInput.files).forEach((file, index) => {
+                            if (file.size > 10 * 1024 * 1024) {
+                                throw new Error('Image size too large (max 10MB)');
                             }
+                            formData.append(`attachment${index + 1}`, file);
+                        });
+                    }
+
+                    // Create email content
+                    let emailContent = `Nova porudžbina - ${window.moveData.category.toUpperCase()}\n\n`;
+                    emailContent += `Kategorija: ${window.moveData.category}\n`;
+                    emailContent += `Ime: ${formData.get('name')}\n`;
+                    emailContent += `Telefon: ${formData.get('phone')}\n`;
+                    emailContent += `Adresa preuzimanja: ${formData.get('pickup_address')}\n`;
+                    emailContent += `Adresa dostave: ${formData.get('delivery_address')}\n\n`;
+                    emailContent += `Detalji:\n`;
+
+                    // Add all other form fields to the email content
+                    for (const [key, value] of formData.entries()) {
+                        if (!['access_key', 'name', 'phone', 'pickup_address', 'delivery_address'].includes(key) && 
+                            !key.startsWith('attachment')) {
+                            emailContent += `${key}: ${value}\n`;
                         }
                     }
 
-                    // Add email subject and template
+                    // Add email formatting
                     formData.append('subject', `Nova porudžbina - ${window.moveData.category.toUpperCase()}`);
-                    formData.append('from_name', 'Muvmi Website');
-                    
-                    // Create a summary of the form data for better email formatting
-                    let summary = `Category: ${window.moveData.category}\n`;
-                    summary += `Pickup Address: ${formData.get('pickup_address')}\n`;
-                    summary += `Delivery Address: ${formData.get('delivery_address')}\n\n`;
-                    
-                    // Add all other form fields to the summary
-                    for (const [key, value] of formData.entries()) {
-                        if (key !== 'access_key' && key !== 'subject' && key !== 'from_name' && 
-                            key !== 'pickup_address' && key !== 'delivery_address' && 
-                            !key.includes('images')) {
-                            summary += `${key}: ${value}\n`;
-                        }
-                    }
-                    
-                    formData.append('message', summary);
+                    formData.append('message', emailContent);
+
+                    console.log('Sending form data...'); // Debug log
 
                     const response = await fetch('https://api.web3forms.com/submit', {
                         method: 'POST',
                         body: formData
                     });
                     
-                    const data = await response.json();
+                    console.log('Response received:', response.status); // Debug log
                     
+                    const data = await response.json();
+                    console.log('Response data:', data); // Debug log
+
                     if (data.success) {
                         alert('Vaš zahtev je uspešno poslat!');
                         window.location.href = 'main.html';
@@ -1022,8 +1025,8 @@
                         throw new Error(data.message || 'Submission failed');
                     }
                 } catch (error) {
-                    console.error('Error:', error);
-                    alert('Došlo je do greške. Molimo pokušajte ponovo.');
+                    console.error('Detailed error:', error); // Detailed error logging
+                    alert('Došlo je do greške. Molimo pokušajte ponovo. Detalji: ' + error.message);
                     submitButton.textContent = 'Pošalji zahtev';
                     submitButton.disabled = false;
                 }
