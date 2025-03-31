@@ -961,6 +961,7 @@
                 submitButton.textContent = 'Slanje...';
                 
                 try {
+                    // Collect form data
                     const formData = new FormData(e.target);
                     const details = Object.fromEntries(formData);
                     const finalData = { ...window.moveData, ...details };
@@ -974,36 +975,55 @@
                         const box = imageBoxes[i];
                         const backgroundImage = box.style.backgroundImage;
                         if (backgroundImage) {
-                            // Extract the base64 data from the background-image URL
-                            const base64Data = backgroundImage.replace(/^url\("data:image\/[^;]+;base64,/, '')
-                                .replace(/"\)$/, '');
-                            imageAttachments.push(base64Data);
+                            try {
+                                // Extract the base64 data from the background-image URL
+                                const base64Data = backgroundImage
+                                    .replace('url("', '')
+                                    .replace('")', '')
+                                    .replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
+                                
+                                // Verify the base64 data is valid
+                                if (base64Data && base64Data.length > 0) {
+                                    imageAttachments.push(base64Data);
+                                }
+                            } catch (imgError) {
+                                console.error('Error processing image:', imgError);
+                            }
                         }
                     }
                     
                     // Format the message content
                     const messageContent = formatEmailContent(finalData);
                     
-                    // Prepare template parameters
+                    // Prepare template parameters with default values
                     const templateParams = {
                         to_name: "Muvmi Tim",
-                        from_name: finalData.name || '',
+                        from_name: finalData.name || 'Nije navedeno',
                         from_phone: '+381 ' + (finalData.phone || ''),
-                        category: window.moveData.category || '',
+                        category: window.moveData.category || 'Nije navedeno',
                         pickup_address: finalData.pickup_address || '',
                         delivery_address: finalData.delivery_address || '',
                         message: messageContent || '',
-                        image1: imageAttachments[0] || '',
-                        image2: imageAttachments[1] || '',
-                        image3: imageAttachments[2] || ''
+                        image1: '',
+                        image2: '',
+                        image3: ''
                     };
                     
+                    // Add images if available
+                    if (imageAttachments.length > 0) {
+                        imageAttachments.forEach((img, index) => {
+                            if (index < 3) {
+                                templateParams[`image${index + 1}`] = img;
+                            }
+                        });
+                    }
+                    
                     // Debug log
-                    console.log('Sending email with images:', {
+                    console.log('Attempting to send email with parameters:', {
                         ...templateParams,
-                        image1: imageAttachments[0] ? 'Image 1 present' : 'No image 1',
-                        image2: imageAttachments[1] ? 'Image 2 present' : 'No image 2',
-                        image3: imageAttachments[2] ? 'Image 3 present' : 'No image 3'
+                        image1: templateParams.image1 ? 'Image 1 present' : 'No image 1',
+                        image2: templateParams.image2 ? 'Image 2 present' : 'No image 2',
+                        image3: templateParams.image3 ? 'Image 3 present' : 'No image 3'
                     });
                     
                     // Send email using EmailJS
@@ -1024,7 +1044,22 @@
                     
                 } catch (error) {
                     console.error('Failed to send email:', error);
-                    alert('Došlo je do greške. Molimo pokušajte ponovo ili nas kontaktirajte direktno.');
+                    console.error('Error details:', {
+                        message: error.message,
+                        stack: error.stack
+                    });
+                    
+                    // More specific error message based on the error type
+                    let errorMessage = 'Došlo je do greške. ';
+                    if (error.message.includes('Network') || error.message.includes('Failed to fetch')) {
+                        errorMessage += 'Proverite vašu internet konekciju i pokušajte ponovo.';
+                    } else if (error.message.includes('timeout')) {
+                        errorMessage += 'Zahtev je istekao. Molimo pokušajte ponovo.';
+                    } else {
+                        errorMessage += 'Molimo pokušajte ponovo ili nas kontaktirajte direktno.';
+                    }
+                    
+                    alert(errorMessage);
                     
                     // Reset button state
                     submitButton.disabled = false;
