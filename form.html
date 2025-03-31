@@ -949,7 +949,24 @@
             formContainer.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
-                const formData = new FormData(e.target);
+                const formData = new FormData();
+                
+                // Debug log
+                console.log('Files being uploaded:', e.target.querySelector('input[type="file"]').files);
+                
+                // Add all form fields to FormData
+                const formFields = e.target.querySelectorAll('input, select, textarea');
+                formFields.forEach(field => {
+                    if (field.type === 'file') {
+                        // Handle multiple files
+                        const files = field.files;
+                        for (let i = 0; i < files.length; i++) {
+                            formData.append('images', files[i]);
+                        }
+                    } else {
+                        formData.append(field.name, field.value);
+                    }
+                });
                 
                 // Add category to form data
                 formData.append('Category', category);
@@ -961,6 +978,11 @@
                 }
                 
                 try {
+                    // Debug log before sending
+                    for (let pair of formData.entries()) {
+                        console.log(pair[0] + ': ' + pair[1]);
+                    }
+                    
                     const response = await fetch(formContainer.action, {
                         method: 'POST',
                         body: formData,
@@ -968,6 +990,9 @@
                             'Accept': 'application/json'
                         }
                     });
+                    
+                    // Debug log response
+                    console.log('Response:', await response.clone().text());
                     
                     if (response.ok) {
                         // Show success message
@@ -978,7 +1003,7 @@
                         throw new Error('Submission failed');
                     }
                 } catch (error) {
-                    console.error('Error:', error);
+                    console.error('Detailed error:', error);
                     alert('Došlo je do greške prilikom slanja zahteva. Molimo pokušajte ponovo.');
                 }
             });
@@ -1095,10 +1120,11 @@
                     });
                 }
             } else if (field.type === 'image_upload') {
+                // Create a hidden input for storing the files
                 const hiddenInput = document.createElement('input');
                 hiddenInput.type = 'file';
                 hiddenInput.className = 'hidden-file-input';
-                hiddenInput.name = 'images[]'; // Changed to array notation for multiple files
+                hiddenInput.name = 'images';  // Changed from 'images[]'
                 hiddenInput.multiple = true;
                 hiddenInput.accept = 'image/*';
                 hiddenInput.required = field.required !== false;
@@ -1115,7 +1141,6 @@
                 fieldDiv.appendChild(container);
                 fieldDiv.appendChild(hiddenInput);
                 
-                // Return early as we've already added everything to fieldDiv
                 return fieldDiv;
             } else {
                 input = document.createElement('input');
@@ -1221,6 +1246,7 @@
             reader.onload = function(e) {
                 box.style.backgroundImage = `url(${e.target.result})`;
                 box.classList.add('has-image');
+                box.dataset.file = file.name; // Store the file name for reference
                 
                 // Add remove button
                 const removeBtn = document.createElement('div');
@@ -1231,6 +1257,18 @@
                 // Handle remove button click
                 removeBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
+                    
+                    // Create a new FileList without the removed file
+                    const dt = new DataTransfer();
+                    const files = hiddenInput.files;
+                    
+                    for (let i = 0; i < files.length; i++) {
+                        if (files[i].name !== file.name) {
+                            dt.items.add(files[i]);
+                        }
+                    }
+                    
+                    hiddenInput.files = dt.files; // Update the input's files
                     box.remove();
                     
                     // Check if we need to add an empty box
