@@ -399,6 +399,14 @@
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Add EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            // Initialize EmailJS with your public key
+            emailjs.init("Psdc4pgmrFBYDPM_8"); // Replace with your actual public key
+        })();
+    </script>
 </head>
 <body>
     <div class="container">
@@ -1224,6 +1232,98 @@
             };
             reader.readAsDataURL(file);
         }
+
+        // Function to convert base64 to blob
+        function base64ToBlob(base64, type = 'image/jpeg') {
+            const byteString = atob(base64.split(',')[1]);
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], { type: type });
+        }
+
+        // Function to handle form submission
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            
+            // Get all form fields
+            const formFields = {};
+            formData.forEach((value, key) => {
+                formFields[key] = value;
+            });
+
+            // Handle image uploads
+            const imageInputs = form.querySelectorAll('input[type="file"]');
+            const imageAttachments = [];
+
+            for (const input of imageInputs) {
+                if (input.files && input.files.length > 0) {
+                    for (const file of input.files) {
+                        // Convert file to base64
+                        const reader = new FileReader();
+                        const base64Promise = new Promise((resolve) => {
+                            reader.onload = (e) => resolve(e.target.result);
+                        });
+                        reader.readAsDataURL(file);
+                        const base64 = await base64Promise;
+                        
+                        // Convert base64 to blob
+                        const blob = base64ToBlob(base64, file.type);
+                        
+                        // Add to attachments
+                        imageAttachments.push({
+                            filename: file.name,
+                            content: base64,
+                            type: file.type
+                        });
+                    }
+                }
+            }
+
+            // Prepare email template parameters
+            const templateParams = {
+                ...formFields,
+                images: imageAttachments
+            };
+
+            try {
+                // Show loading state
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Slanje...';
+                submitBtn.disabled = true;
+
+                // Send email using EmailJS
+                await emailjs.send(
+                    'service_jmhj8ye', // Replace with your EmailJS service ID
+                    'template_j8ve8v6', // Replace with your EmailJS template ID
+                    templateParams
+                );
+
+                // Show success message
+                alert('Vaš zahtev je uspešno poslat! Kontaktiraćemo vas uskoro.');
+                window.location.href = 'main.html';
+            } catch (error) {
+                console.error('Error sending email:', error);
+                alert('Došlo je do greške prilikom slanja zahteva. Molimo pokušajte ponovo.');
+                
+                // Reset button state
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Add form submission handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('details-form');
+            if (form) {
+                form.addEventListener('submit', handleFormSubmit);
+            }
+        });
     </script>
 </body>
 </html>
