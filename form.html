@@ -400,6 +400,11 @@
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script>
+        (function() {
+            emailjs.init("Psdc4pgmrFBYDPM_8"); // Your public key
+        })();
+    </script>
 </head>
 <body>
     <div class="container">
@@ -965,31 +970,37 @@
                 submitButton.disabled = true;
                 submitButton.textContent = 'Slanje...';
 
+                // Format the message content
+                const messageContent = formatEmailContent(finalData);
+
+                // Prepare template parameters
+                const templateParams = {
+                    from_name: finalData.name,
+                    from_phone: '+381 ' + finalData.phone,
+                    category: finalData.category,
+                    pickup_address: finalData.pickup_address,
+                    delivery_address: finalData.delivery_address,
+                    message: messageContent
+                };
+
                 // Send email using EmailJS
-                emailjs.send(
-                    'service_jmhj8ye', // Replace with your EmailJS service ID
-                    'template_j8ve8v6', // Replace with your EmailJS template ID
-                    {
-                        to_email: 'djole.gajic.mes@gmail.com', // Replace with your email
-                        from_name: finalData.name,
-                        from_phone: '+381 ' + finalData.phone,
-                        category: finalData.category,
-                        pickup_address: finalData.pickup_address,
-                        delivery_address: finalData.delivery_address,
-                        message: formatEmailContent(finalData)
-                    }
-                )
-                .then(function(response) {
-                    console.log('SUCCESS!', response.status, response.text);
-                    alert('Vaš zahtev je uspešno poslat! Kontaktiraćemo vas uskoro.');
-                    window.location.href = 'main.html';
-                })
-                .catch(function(error) {
-                    console.log('FAILED...', error);
-                    alert('Došlo je do greške prilikom slanja zahteva. Molimo pokušajte ponovo.');
-                    submitButton.disabled = false;
-                    submitButton.textContent = originalButtonText;
-                });
+                emailjs.send('service_jmhj8ye', 'template_j8ve8v6', templateParams)
+                    .then(function(response) {
+                        console.log('SUCCESS!', response.status, response.text);
+                        alert('Vaš zahtev je uspešno poslat! Kontaktiraćemo vas uskoro.');
+                        window.location.href = 'main.html';
+                    })
+                    .catch(function(error) {
+                        console.error('FAILED...', error);
+                        console.error('Error details:', {
+                            serviceID: 'service_jmhj8ye',
+                            templateID: 'template_j8ve8v6',
+                            params: templateParams
+                        });
+                        alert('Došlo je do greške prilikom slanja zahteva. Molimo pokušajte ponovo.');
+                        submitButton.disabled = false;
+                        submitButton.textContent = originalButtonText;
+                    });
             });
         }
 
