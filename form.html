@@ -1264,26 +1264,22 @@
                 }
             }
 
-            // Prepare the data for email - SIMPLIFIED
+            // Create a simple string representation of all form fields
+            let formDetails = '';
+            for (const [key, value] of Object.entries(formFields)) {
+                if (key !== 'images') {
+                    formDetails += `${key}: ${value}\n`;
+                }
+            }
+
+            // Prepare the data for email - SUPER SIMPLIFIED
             const templateParams = {
                 category: window.moveData?.category || 'N/A',
                 pickup_address: formFields.pickup_address || 'N/A',
                 delivery_address: formFields.delivery_address || 'N/A',
                 name: formFields.name || 'N/A',
                 phone: formFields.phone || 'N/A',
-                description: formFields.description || 'N/A',
-                largest_item_size: formFields.largest_item_size || 'N/A',
-                item_count: formFields.item_count || 'N/A',
-                pickup_floor: formFields.pickup_floor || 'N/A',
-                delivery_floor: formFields.delivery_floor || 'N/A',
-                has_elevator_pickup: formFields.has_elevator_pickup || 'N/A',
-                has_elevator_delivery: formFields.has_elevator_delivery || 'N/A',
-                pickup_access: formFields.pickup_access || 'N/A',
-                delivery_access: formFields.delivery_access || 'N/A',
-                parking_info_pickup: formFields.parking_info_pickup || 'N/A',
-                parking_info_delivery: formFields.parking_info_delivery || 'N/A',
-                special_instructions: formFields.special_instructions || 'N/A',
-                additional_details: formFields.additional_details || 'N/A',
+                form_details: formDetails,
                 images: imageAttachments
             };
 
