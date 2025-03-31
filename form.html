@@ -987,8 +987,12 @@
                 // Add images if they exist
                 const imageInput = e.target.querySelector('input[name="images"]');
                 if (imageInput && imageInput.files) {
+                    // Add each image with a unique name
                     Array.from(imageInput.files).forEach((file, index) => {
-                        submitFormData.append(`image_${index + 1}`, file);
+                        // Create a unique filename
+                        const timestamp = new Date().getTime();
+                        const uniqueName = `image_${timestamp}_${index + 1}_${file.name}`;
+                        submitFormData.append(uniqueName, file);
                     });
                 }
                 
