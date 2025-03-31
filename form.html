@@ -1239,49 +1239,58 @@
                 formFields[key] = value;
             });
 
-            // Handle image uploads
-            const imageInputs = form.querySelectorAll('input[type="file"]');
-            const imageAttachments = [];
+            // Create a clean HTML template for the email
+            let emailContent = `
+                <h2>Novi zahtev za transport</h2>
+                <p><strong>Kategorija:</strong> ${window.moveData?.category || 'N/A'}</p>
+                <p><strong>Adresa preuzimanja:</strong> ${formFields.pickup_address || 'N/A'}</p>
+                <p><strong>Adresa dostave:</strong> ${formFields.delivery_address || 'N/A'}</p>
+                <p><strong>Ime:</strong> ${formFields.name || 'N/A'}</p>
+                <p><strong>Telefon:</strong> ${formFields.phone || 'N/A'}</p>
+                <p><strong>Opis:</strong> ${formFields.description || 'N/A'}</p>
+            `;
 
+            // Add all other form fields except images
+            for (const [key, value] of Object.entries(formFields)) {
+                if (key !== 'images' && key !== 'pickup_address' && key !== 'delivery_address' && 
+                    key !== 'name' && key !== 'phone' && key !== 'description') {
+                    const label = key.split('_').map(word => 
+                        word.charAt(0).toUpperCase() + word.slice(1)
+                    ).join(' ');
+                    emailContent += `<p><strong>${label}:</strong> ${value || 'N/A'}</p>`;
+                }
+            }
+
+            // Count images
+            const imageInputs = form.querySelectorAll('input[type="file"]');
+            let imageCount = 0;
             for (const input of imageInputs) {
                 if (input.files && input.files.length > 0) {
-                    for (const file of input.files) {
-                        // Convert file to base64
-                        const reader = new FileReader();
-                        const base64Promise = new Promise((resolve) => {
-                            reader.onload = (e) => resolve(e.target.result);
-                        });
-                        reader.readAsDataURL(file);
-                        const base64 = await base64Promise;
-                        
-                        // Add to attachments
-                        imageAttachments.push({
-                            filename: file.name,
-                            content: base64,
-                            type: file.type
-                        });
-                    }
+                    imageCount = input.files.length;
                 }
             }
+            emailContent += `<p><strong>Broj priloženih slika:</strong> ${imageCount}</p>`;
 
-            // Create a simple string representation of all form fields
-            let formDetails = '';
-            for (const [key, value] of Object.entries(formFields)) {
-                if (key !== 'images') {
-                    formDetails += `${key}: ${value}\n`;
-                }
-            }
-
-            // Prepare the data for email - SUPER SIMPLIFIED
+            // Prepare the data for email
             const templateParams = {
+                to_name: 'Muvmi Support',
+                from_name: formFields.name || 'N/A',
                 category: window.moveData?.category || 'N/A',
                 pickup_address: formFields.pickup_address || 'N/A',
                 delivery_address: formFields.delivery_address || 'N/A',
                 name: formFields.name || 'N/A',
                 phone: formFields.phone || 'N/A',
-                form_details: formDetails,
-                images: imageAttachments
+                description: formFields.description || 'N/A',
+                message: emailContent
             };
+
+            // Add all other form fields to templateParams
+            for (const [key, value] of Object.entries(formFields)) {
+                if (key !== 'images' && key !== 'pickup_address' && key !== 'delivery_address' && 
+                    key !== 'name' && key !== 'phone' && key !== 'description') {
+                    templateParams[key] = value || 'N/A';
+                }
+            }
 
             try {
                 // Show loading state
