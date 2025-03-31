@@ -954,50 +954,44 @@
                 submitButton.disabled = true;
 
                 try {
-                    const formData = new FormData();
+                    const formData = new FormData(e.target);
                     
-                    // Add the access key
-                    formData.append('access_key', 'd7a51c8c-49a5-4b8e-b9c3-59c745102042');
-                    
-                    // Add basic info
+                    // Add the access key if not already in the form
+                    if (!formData.has('access_key')) {
+                        formData.append('access_key', 'd7a51c8c-49a5-4b8e-b9c3-59c745102042');
+                    }
+
+                    // Add category
                     formData.append('category', window.moveData.category);
-                    formData.append('pickup_address', e.target.querySelector('[name="pickup_address"]').value);
-                    formData.append('delivery_address', e.target.querySelector('[name="delivery_address"]').value);
-                    formData.append('name', e.target.querySelector('[name="name"]').value);
-                    formData.append('phone', '+381' + e.target.querySelector('[name="phone"]').value);
 
-                    // Process all form inputs except file inputs
-                    const inputs = e.target.querySelectorAll('input:not([type="file"]), select, textarea');
-                    inputs.forEach(input => {
-                        if (input.name && input.name !== 'access_key') {
-                            formData.append(input.name, input.value);
+                    // Handle file inputs separately
+                    const fileInput = e.target.querySelector('input[type="file"]');
+                    if (fileInput && fileInput.files.length > 0) {
+                        // Check total number of files
+                        if (fileInput.files.length > 10) {
+                            throw new Error('Maksimalno 10 slika je dozvoljeno');
                         }
-                    });
 
-                    // Process images
-                    const imageInput = e.target.querySelector('input[type="file"]');
-                    if (imageInput && imageInput.files.length > 0) {
-                        Array.from(imageInput.files).forEach((file, index) => {
+                        // Process each file
+                        for (let i = 0; i < fileInput.files.length; i++) {
+                            const file = fileInput.files[i];
+                            
+                            // Check file size (10MB limit)
                             if (file.size > 10 * 1024 * 1024) {
-                                throw new Error('Image size too large (max 10MB)');
+                                throw new Error(`Slika ${file.name} je prevelika. Maksimalna veličina je 10MB`);
                             }
-                            formData.append(`attachment${index + 1}`, file);
-                        });
+
+                            // Append each file with a unique name
+                            formData.append(`file${i + 1}`, file);
+                        }
                     }
 
                     // Create email content
                     let emailContent = `Nova porudžbina - ${window.moveData.category.toUpperCase()}\n\n`;
-                    emailContent += `Kategorija: ${window.moveData.category}\n`;
-                    emailContent += `Ime: ${formData.get('name')}\n`;
-                    emailContent += `Telefon: ${formData.get('phone')}\n`;
-                    emailContent += `Adresa preuzimanja: ${formData.get('pickup_address')}\n`;
-                    emailContent += `Adresa dostave: ${formData.get('delivery_address')}\n\n`;
-                    emailContent += `Detalji:\n`;
-
-                    // Add all other form fields to the email content
+                    
+                    // Add form fields to email content
                     for (const [key, value] of formData.entries()) {
-                        if (!['access_key', 'name', 'phone', 'pickup_address', 'delivery_address'].includes(key) && 
-                            !key.startsWith('attachment')) {
+                        if (!key.startsWith('file') && key !== 'access_key') {
                             emailContent += `${key}: ${value}\n`;
                         }
                     }
@@ -1148,7 +1142,7 @@
                 const hiddenInput = document.createElement('input');
                 hiddenInput.type = 'file';
                 hiddenInput.className = 'hidden-file-input';
-                hiddenInput.name = `${window.moveData.category}_images[]`;
+                hiddenInput.name = 'files[]'; // Changed from category-specific name
                 hiddenInput.multiple = true;
                 hiddenInput.accept = 'image/*';
                 hiddenInput.required = field.required !== false;
