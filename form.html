@@ -955,56 +955,39 @@
             form.onsubmit = async function(e) {
                 e.preventDefault();
                 
-                // Show loading state
                 const submitButton = e.target.querySelector('button[type="submit"]');
                 submitButton.disabled = true;
                 submitButton.textContent = 'Slanje...';
                 
                 try {
                     const formData = new FormData(e.target);
-                    const details = Object.fromEntries(formData);
-                    const finalData = { ...window.moveData, ...details };
-                    
-                    // Handle image files - limit to first 3 images and compress them
                     const imageInput = e.target.querySelector('input[type="file"]');
-                    let imageAttachments = [];
+                    const imagePromises = [];
                     
+                    // Handle images (up to 20)
                     if (imageInput && imageInput.files.length > 0) {
-                        // Take only first 3 images
-                        const maxImages = Math.min(imageInput.files.length, 3);
+                        const maxImages = Math.min(imageInput.files.length, 20);
                         for (let i = 0; i < maxImages; i++) {
                             const file = imageInput.files[i];
-                            const compressedBase64 = await compressAndConvertToBase64(file);
-                            imageAttachments.push(compressedBase64);
+                            imagePromises.push(compressAndConvertToBase64(file));
                         }
                     }
                     
-                    // Format the message content
-                    const messageContent = formatEmailContent(finalData);
+                    // Wait for all images to be processed
+                    const images = await Promise.all(imagePromises);
                     
-                    // Prepare template parameters - be explicit about each field
+                    // Create template parameters
                     const templateParams = {
                         to_name: "Muvmi Tim",
-                        from_name: finalData.name || '',
-                        from_phone: '+381 ' + (finalData.phone || ''),
-                        category: window.moveData.category || '',
-                        pickup_address: finalData.pickup_address || '',
-                        delivery_address: finalData.delivery_address || '',
-                        message: messageContent || '',
-                        image1: imageAttachments[0] || '',
-                        image2: imageAttachments[1] || '',
-                        image3: imageAttachments[2] || ''
+                        from_name: formData.get('name') || '',
+                        from_phone: '+381 ' + (formData.get('phone') || ''),
+                        pickup_address: formData.get('pickup_address') || '',
+                        delivery_address: formData.get('delivery_address') || '',
+                        message: formatEmailContent(Object.fromEntries(formData)),
+                        images: images // Array of all processed images
                     };
                     
-                    // Debug log
-                    console.log('Sending email with template parameters:', {
-                        ...templateParams,
-                        image1: imageAttachments[0] ? 'Image 1 attached' : 'No image',
-                        image2: imageAttachments[1] ? 'Image 2 attached' : 'No image',
-                        image3: imageAttachments[2] ? 'Image 3 attached' : 'No image'
-                    });
-                    
-                    // Send email using EmailJS
+                    // Send email
                     const response = await emailjs.send(
                         'service_jmhj8ye',
                         'template_j8ve8v6',
@@ -1014,15 +997,11 @@
                     
                     console.log('Email sent successfully:', response);
                     alert('Hvala! Vaš zahtev je uspešno poslat. Kontaktiraćemo vas uskoro.');
-                    
-                    // Redirect to main page after successful submission
                     window.location.href = '/';
                     
                 } catch (error) {
                     console.error('Failed to send email:', error);
                     alert('Došlo je do greške. Molimo pokušajte ponovo ili nas kontaktirajte direktno.');
-                    
-                    // Reset button state
                     submitButton.disabled = false;
                     submitButton.textContent = 'Pošalji zahtev';
                 }
@@ -1342,7 +1321,7 @@ Detalji zahteva:
             return content;
         }
 
-        // Add this helper function to compress and convert images to base64
+        // Helper function to compress images
         async function compressAndConvertToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -1353,32 +1332,25 @@ Detalji zahteva:
                         let width = img.width;
                         let height = img.height;
                         
-                        // Maximum dimensions
-                        const MAX_WIDTH = 800;
-                        const MAX_HEIGHT = 800;
-                        
-                        // Calculate new dimensions while maintaining aspect ratio
+                        // Max dimensions
+                        const MAX_SIZE = 800;
                         if (width > height) {
-                            if (width > MAX_WIDTH) {
-                                height *= MAX_WIDTH / width;
-                                width = MAX_WIDTH;
+                            if (width > MAX_SIZE) {
+                                height *= MAX_SIZE / width;
+                                width = MAX_SIZE;
                             }
                         } else {
-                            if (height > MAX_HEIGHT) {
-                                width *= MAX_HEIGHT / height;
-                                height = MAX_HEIGHT;
+                            if (height > MAX_SIZE) {
+                                width *= MAX_SIZE / height;
+                                height = MAX_SIZE;
                             }
                         }
                         
                         canvas.width = width;
                         canvas.height = height;
-                        
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        
-                        // Convert to base64 with reduced quality
-                        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-                        resolve(compressedBase64);
+                        resolve(canvas.toDataURL('image/jpeg', 0.7));
                     };
                     img.onerror = reject;
                     img.src = e.target.result;
