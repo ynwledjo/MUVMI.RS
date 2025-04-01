@@ -970,6 +970,31 @@
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
+                // Validate all required fields
+                const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
+                let isValid = true;
+                let firstInvalidField = null;
+
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        isValid = false;
+                        field.classList.add('invalid');
+                        if (!firstInvalidField) {
+                            firstInvalidField = field;
+                        }
+                    } else {
+                        field.classList.remove('invalid');
+                    }
+                });
+
+                if (!isValid) {
+                    alert('Molimo popunite sva obavezna polja.');
+                    if (firstInvalidField) {
+                        firstInvalidField.focus();
+                    }
+                    return;
+                }
+                
                 // Show loading state
                 const submitBtn = form.querySelector('button[type="submit"]');
                 const originalText = submitBtn.textContent;
@@ -1056,10 +1081,16 @@
                 input = document.createElement('textarea');
                 input.name = field.name;
                 input.required = field.required !== false;
+                if (field.required !== false) {
+                    input.setAttribute('required', 'required');
+                }
             } else if (field.type === 'select') {
                 input = document.createElement('select');
                 input.name = field.name;
                 input.required = field.required !== false;
+                if (field.required !== false) {
+                    input.setAttribute('required', 'required');
+                }
                 field.options.forEach(opt => {
                     const option = document.createElement('option');
                     option.value = opt.toLowerCase().replace(/ /g, '_');
@@ -1169,6 +1200,9 @@
                 input.type = field.type;
                 input.name = field.name;
                 input.required = field.required !== false;
+                if (field.required !== false) {
+                    input.setAttribute('required', 'required');
+                }
             }
             
             fieldDiv.appendChild(input);
