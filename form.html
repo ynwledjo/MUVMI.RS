@@ -814,11 +814,6 @@
                 // Special handling for these categories...
                 const fieldConfigs = formConfigs[category] || [];
                 
-                // Create a new form element
-                const form = document.createElement('form');
-                form.id = 'details-form';
-                form.appendChild(formGrid);
-                
                 // Add fields before images
                 for (let i = 0; i < fieldConfigs.length; i++) {
                     // Skip image_upload and moving_date as they'll be handled separately
@@ -838,139 +833,6 @@
                 if (dateField) {
                     formGrid.appendChild(createFormField(dateField));
                 }
-                
-                // Add name and phone fields before the submit button
-                const nameField = document.createElement('div');
-                nameField.className = 'form-field';
-                const nameLabel = document.createElement('label');
-                nameLabel.textContent = 'Vaše ime';
-                const nameInput = document.createElement('input');
-                nameInput.type = 'text';
-                nameInput.name = 'name';
-                nameInput.required = true;
-                nameField.appendChild(nameLabel);
-                nameField.appendChild(nameInput);
-                formGrid.insertBefore(nameField, submitDiv);
-
-                const phoneField = document.createElement('div');
-                phoneField.className = 'form-field';
-                const phoneLabel = document.createElement('label');
-                phoneLabel.textContent = 'Broj telefona';
-                const phoneInput = document.createElement('input');
-                phoneInput.type = 'tel';
-                phoneInput.name = 'phone';
-                phoneInput.required = true;
-                phoneInput.pattern = '[0-9]*';
-                phoneInput.maxLength = 10;
-                
-                // Create a wrapper div for the phone input
-                const phoneWrapper = document.createElement('div');
-                phoneWrapper.style.position = 'relative';
-                phoneWrapper.style.display = 'flex';
-                phoneWrapper.style.alignItems = 'center';
-                
-                // Create the prefix span
-                const prefixSpan = document.createElement('span');
-                prefixSpan.textContent = '+381\u2009';
-                prefixSpan.style.position = 'absolute';
-                prefixSpan.style.left = '12px';
-                prefixSpan.style.color = 'var(--text)';
-                prefixSpan.style.fontSize = '14px';
-                prefixSpan.style.fontFamily = 'Inter, sans-serif';
-                
-                // Style the input to accommodate the prefix
-                phoneInput.style.paddingLeft = '52px';
-                
-                // Add prefix and validation
-                phoneInput.addEventListener('input', function(e) {
-                    this.value = this.value.replace(/[^0-9]/g, '');
-                    if (this.value.length > 10) {
-                        this.value = this.value.slice(0, 10);
-                    }
-                });
-
-                // Add the prefix span and input to the wrapper
-                phoneWrapper.appendChild(prefixSpan);
-                phoneWrapper.appendChild(phoneInput);
-                
-                phoneField.appendChild(phoneLabel);
-                phoneField.appendChild(phoneWrapper);
-                formGrid.insertBefore(phoneField, submitDiv);
-                
-                // Add submit button
-                const submitDiv = document.createElement('div');
-                submitDiv.className = 'form-field full-width';
-                const submitBtn = document.createElement('button');
-                submitBtn.type = 'submit';
-                submitBtn.textContent = 'Pošalji zahtev';
-                submitDiv.appendChild(submitBtn);
-                formGrid.appendChild(submitDiv);
-                
-                // Add the form to the container
-                formContainer.appendChild(form);
-                
-                // Add form submission handler
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    // Show loading state
-                    const submitBtn = this.querySelector('button[type="submit"]');
-                    const originalText = submitBtn.textContent;
-                    submitBtn.textContent = 'Slanje...';
-                    submitBtn.disabled = true;
-                    
-                    const formData = new FormData(this);
-                    
-                    // Handle the date format properly
-                    const specificDateInput = this.querySelector('input[name="specific_date"]');
-                    if (specificDateInput && specificDateInput.getAttribute('data-formatted-date')) {
-                        formData.set('specific_date', specificDateInput.getAttribute('data-formatted-date'));
-                    }
-                    
-                    const details = Object.fromEntries(formData);
-                    
-                    // Create a formatted details string
-                    let detailsString = '';
-                    for (const [key, value] of Object.entries(details)) {
-                        if (!['name', 'phone', 'pickup_address', 'delivery_address', 'category', 'pickup', 'delivery'].includes(key)) {
-                            const formattedKey = key
-                                .split('_')
-                                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                                .join(' ');
-                            
-                            if (value && value !== '') {
-                                detailsString += `${formattedKey}: ${value}\n`;
-                            }
-                        }
-                    }
-                    
-                    // Combine with initial data
-                    const finalData = { 
-                        ...window.moveData, 
-                        name: details.name,
-                        phone: details.phone,
-                        pickup_address: details.pickup_address,
-                        delivery_address: details.delivery_address,
-                        details: detailsString
-                    };
-                    
-                    // Initialize EmailJS
-                    emailjs.init("Psdc4pgmrFBYDPM_8");
-                    
-                    // Send email using EmailJS
-                    emailjs.send("service_jmhj8ye", "template_j8ve8v6", finalData)
-                        .then(function(response) {
-                            alert("Vaš zahtev je uspešno poslat! Kontaktiraćemo vas uskoro.");
-                            window.location.href = 'https://muvmi.rs';
-                        }, function(error) {
-                            alert("Došlo je do greške prilikom slanja zahteva. Molimo pokušajte ponovo.");
-                            console.error("EmailJS error:", error);
-                        })
-                        .finally(function() {
-                            submitBtn.textContent = originalText;
-                            submitBtn.disabled = false;
-                        });
-                });
             } else {
                 // For other categories, follow the regular flow
                 const categoryFields = formConfigs[category] || [];
@@ -989,6 +851,15 @@
                 }
             }
             
+            // Add submit button
+            const submitDiv = document.createElement('div');
+            submitDiv.className = 'form-field full-width';
+            const submitBtn = document.createElement('button');
+            submitBtn.type = 'submit';
+            submitBtn.textContent = 'Pošalji zahtev';
+            submitDiv.appendChild(submitBtn);
+            formGrid.appendChild(submitDiv);
+
             // Add return to home link
             const homeLinkDiv = document.createElement('div');
             homeLinkDiv.className = 'form-field full-width';
@@ -1052,7 +923,139 @@
                 }
             });
             
+            // Add name and phone fields before the submit button
+            const nameField = document.createElement('div');
+            nameField.className = 'form-field';
+            const nameLabel = document.createElement('label');
+            nameLabel.textContent = 'Vaše ime';
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.name = 'name';
+            nameInput.required = true;
+            nameField.appendChild(nameLabel);
+            nameField.appendChild(nameInput);
+            formGrid.insertBefore(nameField, submitDiv);
+
+            const phoneField = document.createElement('div');
+            phoneField.className = 'form-field';
+            const phoneLabel = document.createElement('label');
+            phoneLabel.textContent = 'Broj telefona';
+            const phoneInput = document.createElement('input');
+            phoneInput.type = 'tel';
+            phoneInput.name = 'phone';
+            phoneInput.required = true;
+            phoneInput.pattern = '[0-9]*';
+            phoneInput.maxLength = 10;
+            
+            // Create a wrapper div for the phone input
+            const phoneWrapper = document.createElement('div');
+            phoneWrapper.style.position = 'relative';
+            phoneWrapper.style.display = 'flex';
+            phoneWrapper.style.alignItems = 'center';
+            
+            // Create the prefix span
+            const prefixSpan = document.createElement('span');
+            prefixSpan.textContent = '+381\u2009'; // Using thin space for even smaller spacing
+            prefixSpan.style.position = 'absolute';
+            prefixSpan.style.left = '12px';
+            prefixSpan.style.color = 'var(--text)';
+            prefixSpan.style.fontSize = '14px';
+            prefixSpan.style.fontFamily = 'Inter, sans-serif';
+            
+            // Style the input to accommodate the prefix
+            phoneInput.style.paddingLeft = '52px'; // Reduced from 55px to 52px
+            
+            // Add prefix and validation
+            phoneInput.addEventListener('input', function(e) {
+                // Remove any non-numeric characters
+                this.value = this.value.replace(/[^0-9]/g, '');
+                
+                // Limit to 10 digits (excluding prefix)
+                if (this.value.length > 10) {
+                    this.value = this.value.slice(0, 10);
+                }
+            });
+
+            // Add the prefix span and input to the wrapper
+            phoneWrapper.appendChild(prefixSpan);
+            phoneWrapper.appendChild(phoneInput);
+            
+            phoneField.appendChild(phoneLabel);
+            phoneField.appendChild(phoneWrapper);
+            formGrid.insertBefore(phoneField, submitDiv);
+            
             formContainer.appendChild(formGrid);
+            
+            // Handle form submission
+            const form = document.getElementById('details-form');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Show loading state
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Slanje...';
+                submitBtn.disabled = true;
+                
+                const formData = new FormData(form);
+                
+                // Handle the date format properly
+                const specificDateInput = form.querySelector('input[name="specific_date"]');
+                if (specificDateInput && specificDateInput.getAttribute('data-formatted-date')) {
+                    formData.set('specific_date', specificDateInput.getAttribute('data-formatted-date'));
+                }
+                
+                const details = Object.fromEntries(formData);
+                
+                // Create a formatted details string
+                let detailsString = '';
+                for (const [key, value] of Object.entries(details)) {
+                    // Skip the basic fields that are shown separately
+                    if (!['name', 'phone', 'pickup_address', 'delivery_address', 'category', 'pickup', 'delivery'].includes(key)) {
+                        // Format the key to be more readable
+                        const formattedKey = key
+                            .split('_')
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                            .join(' ');
+                        
+                        // Handle empty values
+                        if (value && value !== '') {
+                            detailsString += `${formattedKey}: ${value}\n`;
+                        }
+                    }
+                }
+                
+                // Combine with initial data
+                const finalData = { 
+                    ...window.moveData, 
+                    name: details.name,
+                    phone: details.phone,
+                    pickup_address: details.pickup_address,
+                    delivery_address: details.delivery_address,
+                    details: detailsString
+                };
+                
+                // Initialize EmailJS
+                emailjs.init("Psdc4pgmrFBYDPM_8");
+                
+                // Send email using EmailJS
+                emailjs.send("service_jmhj8ye", "template_j8ve8v6", finalData)
+                    .then(function(response) {
+                        // Show success message
+                        alert("Vaš zahtev je uspešno poslat! Kontaktiraćemo vas uskoro.");
+                        // Redirect to home page
+                        window.location.href = 'https://muvmi.rs';
+                    }, function(error) {
+                        // Show error message
+                        alert("Došlo je do greške prilikom slanja zahteva. Molimo pokušajte ponovo.");
+                        console.error("EmailJS error:", error);
+                    })
+                    .finally(function() {
+                        // Reset button state
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
+                    });
+            });
         }
 
         function createFormField(field) {
