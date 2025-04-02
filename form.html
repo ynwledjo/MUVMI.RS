@@ -659,11 +659,9 @@
                     // Set default to required
                     field.required = true;
                     
-                    // Exceptions: make these fields optional
-                    if (field.name === 'special_instructions' || 
-                        field.name === 'additional_details' || 
-                        field.name === 'images' || 
-                        field.name === 'notes') {
+                    // Only make these specific fields optional
+                    if (field.name === 'additional_details' || 
+                        field.name === 'special_instructions') {
                         field.required = false;
                     }
                 });
@@ -671,12 +669,7 @@
             
             // Also update common fields
             commonFields.forEach(field => {
-                // Special requirements is similar to notes/additional details
-                if (field.name === 'special_requirements') {
-                    field.required = false;
-                } else {
-                    field.required = true;
-                }
+                field.required = true;
             });
         }
 
@@ -969,6 +962,24 @@
             
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
+                
+                // Check if all required fields are filled
+                const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
+                let allFieldsFilled = true;
+                
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        allFieldsFilled = false;
+                        field.style.borderColor = 'red';
+                    } else {
+                        field.style.borderColor = '';
+                    }
+                });
+                
+                if (!allFieldsFilled) {
+                    alert('Molimo popunite sva obavezna polja');
+                    return;
+                }
                 
                 // Show loading state
                 const submitBtn = form.querySelector('button[type="submit"]');
