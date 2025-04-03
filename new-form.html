@@ -502,6 +502,21 @@
             const movingDateSelect = document.getElementById('moving_date');
             const datePickerContainer = document.getElementById('date_picker_container');
             const specificDateInput = document.getElementById('specific_date');
+            const pickupAddressInput = document.getElementById('pickup_address');
+            const deliveryAddressInput = document.getElementById('delivery_address');
+            
+            // Get address parameters from URL
+            const params = new URLSearchParams(window.location.search);
+            const pickup = params.get('pickup');
+            const delivery = params.get('delivery');
+            
+            // Pre-fill address fields if parameters exist
+            if (pickup) {
+                pickupAddressInput.value = decodeURIComponent(pickup);
+            }
+            if (delivery) {
+                deliveryAddressInput.value = decodeURIComponent(delivery);
+            }
             
             // Phone number validation
             phoneInput.addEventListener('input', function(e) {
