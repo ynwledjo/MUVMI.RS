@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Moving Quote - Muvmi</title>
+    <style>
+        :root {
+            --primary: #F16622;
+            --primary-dark: #d14d0d;
+            --primary-light: #ff8f54;
+            --secondary: #F5F7FA;
+            --secondary-dark: #E4E7EB;
+            --text: #1F2937;
+            --text-light: #6B7280;
+            --white: #FFFFFF;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.05);
+            --border-radius-sm: 4px;
+            --border-radius-md: 6px;
+            --border-radius-lg: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--secondary);
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--secondary-dark);
+        }
+
+        .form-header-content {
+            text-align: left;
+        }
+
+        .form-header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: var(--text);
+            font-family: 'Manrope', sans-serif;
+            font-weight: 700;
+        }
+
+        .form-header p {
+            color: var(--text-light);
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-container {
+            background: var(--white);
+            border-radius: 0;
+            box-shadow: var(--shadow-md);
+            padding: 40px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-field {
+            margin-bottom: 20px;
+        }
+
+        .form-field.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-field label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--text);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-field label span {
+            color: var(--text-light);
+            font-weight: 400;
+            font-size: 13px;
+        }
+
+        .form-field input,
+        .form-field select,
+        .form-field textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--secondary-dark);
+            border-radius: var(--border-radius-md);
+            font-size: 14px;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-field textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .form-field button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-top: 10px;
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-field button:hover {
+            background: var(--primary-dark);
+        }
+
+        .form-field button:disabled {
+            background: var(--text-light);
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .error {
+            border-color: #dc2626 !important;
+        }
+
+        .logo {
+            width: 40px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo img {
+            width: 100%;
+            height: auto;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0;
+            }
+            
+            .form-container {
+                border-radius: 0;
+                padding: 20px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Add modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-content h3 {
+            color: var(--text);
+            margin-bottom: 15px;
+            font-family: 'Manrope', sans-serif;
+            font-size: 18px;
+        }
+
+        .modal-content p {
+            color: var(--text-light);
+            margin-bottom: 25px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-button {
+            padding: 10px 20px;
+            border-radius: var(--border-radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-button.cancel {
+            background-color: var(--secondary);
+            color: var(--text);
+            border: none;
+        }
+
+        .modal-button.cancel:hover {
+            background-color: var(--secondary-dark);
+        }
+
+        .modal-button.proceed {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+        }
+
+        .modal-button.proceed:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Add calendar styles */
+        .calendar-date-picker {
+            appearance: none;
+            -webkit-appearance: none;
+            padding: 12px;
+            border: 1px solid var(--secondary-dark);
+            border-radius: var(--border-radius-md);
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            width: 100%;
+            background-color: var(--white);
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .calendar-date-picker:hover {
+            border-color: var(--primary);
+        }
+
+        .calendar-date-picker:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(241, 102, 34, 0.25);
+        }
+
+        .calendar-date-picker::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            opacity: 0.8;
+            padding: 5px;
+            color: var(--primary);
+            background-position: right center;
+            background-size: 20px;
+            margin-right: 5px;
+        }
+
+        .calendar-date-picker::-webkit-datetime-edit {
+            padding: 0;
+        }
+
+        .calendar-date-picker::-webkit-inner-spin-button {
+            display: none;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <div class="form-header-content">
+                    <h1>Detalji transporta</h1>
+                    <p>Pomožite nam da razumemo vaše potrebe kako bismo dobili tačne ponude</p>
+                </div>
+                <div class="logo">
+                    <a href="https://muvmi.rs">
+                        <img src="IMAGES/muvmi-logo.webp" alt="Muvmi">
+                    </a>
+                </div>
+            </div>
+            <form id="details-form">
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="pickup_address">Adresa preuzimanja</label>
+                        <input type="text" id="pickup_address" name="pickup_address" required>
+                        <div class="error-message">Ovo polje je obavezno</div>
+                    </div>
+                    <div class="form-field">
+                        <label for="delivery_address">Adresa dostave</label>
+                        <input type="text" id="delivery_address" name="delivery_address" required>
+                        <div class="error-message">Ovo polje je obavezno</div>
+                    </div>
+                    <div class="form-field full-width">
+                        <label for="description">Ukratko opišite šta premeštate</label>
+                        <textarea id="description" name="description" required></textarea>
+                        <div class="error-message">Ovo polje je obavezno</div>
+                    </div>
+                    <div class="form-field">
+                        <label for="largest_item_size">Veličina najvećeg predmeta</label>
+                        <select id="largest_item_size" name="largest_item_size" required>
+                            <option value="">Izaberite veličinu</option>
+                            <option value="mali">Mali (stane u auto)</option>
+                            <option value="srednji">Srednji (stane u kombi)</option>
+                            <option value="veliki">Veliki (zahteva kamion)</option>
+                        </select>
+                        <div class="error-message">Ovo polje je obavezno</div>
+                    </div>
+                    <div class="form-field">
+                        <label for="item_count">Broj predmeta</label>
+                        <input type="number" id="item_count" name="item_count" required>
+                        <div class="error-message">Ovo polje je obavezno</div>
+                    </div>
+                    <div class="form-field">
+                        <label for="assembly_needed">Da li je potrebna demontaža</label>
+                        <select id="assembly_needed" name="assembly_needed" required>
+                            <option value="">Izaberite</option>
+                            <option value="ne">Ne</option>
+                            <option value="da">Da</option>
+                        </select>
+                        <div class="error-message">Ovo polje je obavezno</div>
+                    </div>
+                    <div class="form-field">
+                        <label for="disassembly_needed">Da li je potrebna montaža</label>
+                        <select id="disassembly_needed" name="disassembly_needed" required>
+                            <option value="">Izaberite</option>
+                            <option value="ne">Ne</option>
+                            <option value="da">Da</option>
+                        </select>
+                        <div class="error-message">Ovo polje je obavezno</div>
+                    </div>
+                    <div class="form-field">
+                        <label for="pickup_floor">Sprat (mesto utovara)</label>
+                        <input type="number" id="pickup_floor" name="pickup_floor" required>
+                        <div class="error-message">Ovo polje je obavezno</div>
+                    </div>
+                    <div class="form-field">
+                        <label for="delivery_floor">Sprat (mesto istovara)</label>
+                        <input type="number" id="delivery_floor" name="delivery_floor" required>
+                        <div class="error-message">Ovo polje je obavezno</div>
+                    </div>
+                    <div class="form-field">
+                        <label for="has_elevator_pickup">Da li zgrada ima lift (mesto utovara)</label>
+                        <select id="has_elevator_pickup" name="has_elevator_pickup" required>
+                            <option value="">Izaberite</option>
+                            <option value="da">Da</option>
+                            <option value="ne">Ne</option>
+                        </select>
+                        <div class="error-message">Ovo polje je obavezno</div>
+                    </div>
+                    <div class="form-field">
+                        <label for="has_elevator_delivery">Da li zgrada ima lift (mesto istovara)</label>
+                        <select id="has_elevator_delivery" name="has_elevator_delivery" required>
+                            <option value="">Izaberite</option>
+                            <option value="da">Da</option>
+                            <option value="ne">Ne</option>
+                        </select>
+                        <div class="error-message">Ovo polje je obavezno</div>
+                    </div>
+                    <div class="form-field">
+                        <label for="pickup_access">Pristup mestu utovara</label>
+                        <select id="pickup_access" name="pickup_access" required>
+                            <option value="">Izaberite</option>
+                            <option value="lak_pristup">Lak pristup</option>
+                            <option value="stepenice">Stepenice</option>
+                            <option value="lift">Lift</option>
+                            <option value="otezan_pristup">Otežan pristup</option>
+                        </select>
+                        <div class="error-message">Ovo polje je obavezno</div>
+                    </div>
+                    <div class="form-field">
+                        <label for="delivery_access">Pristup mestu istovara</label>
+                        <select id="delivery_access" name="delivery_access" required>
+                            <option value="">Izaberite</option>
+                            <option value="lak_pristup">Lak pristup</option>
+                            <option value="stepenice">Stepenice</option>
+                            <option value="lift">Lift</option>
+                            <option value="otezan_pristup">Otežan pristup</option>
+                        </select>
+                        <div class="error-message">Ovo polje je obavezno</div>
+                    </div>
+                    <div class="form-field">
+                        <label for="parking_info_pickup">Parking info (mesto utovara)</label>
+                        <input type="text" id="parking_info_pickup" name="parking_info_pickup" required>
+                        <div class="error-message">Ovo polje je obavezno</div>
+                    </div>
+                    <div class="form-field">
+                        <label for="parking_info_delivery">Parking info (mesto istovara)</label>
+                        <input type="text" id="parking_info_delivery" name="parking_info_delivery" required>
+                        <div class="error-message">Ovo polje je obavezno</div>
+                    </div>
+                    <div class="form-field full-width">
+                        <label for="special_instructions">Specijalne instrukcije (npr. koristite dvorište, pozovite pre nego što stignete...)</label>
+                        <textarea id="special_instructions" name="special_instructions"></textarea>
+                    </div>
+                    <div class="form-field full-width">
+                        <label for="additional_details">Dodatni detalji</label>
+                        <textarea id="additional_details" name="additional_details"></textarea>
+                    </div>
+                    <div class="form-field">
+                        <label for="moving_date">Datum</label>
+                        <select id="moving_date" name="moving_date" required>
+                            <option value="">Izaberite datum</option>
+                            <option value="hitno">Hitno</option>
+                            <option value="u_toku_nedelje">U toku nedelje</option>
+                            <option value="izaberite_datum">Izaberite datum</option>
+                            <option value="jos_uvek_ne_znam">Još uvek ne znam datum</option>
+                        </select>
+                        <div class="error-message">Ovo polje je obavezno</div>
+                    </div>
+                    <div id="date_picker_container" class="form-field" style="display: none;">
+                        <label for="specific_date">Izaberite datum</label>
+                        <input type="date" id="specific_date" name="specific_date" class="calendar-date-picker">
+                        <div class="error-message">Ovo polje je obavezno</div>
+                    </div>
+                    <div class="form-field">
+                        <label for="name">Vaše ime</label>
+                        <input type="text" id="name" name="name" required>
+                        <div class="error-message">Ovo polje je obavezno</div>
+                    </div>
+                    <div class="form-field">
+                        <label for="phone">Broj telefona</label>
+                        <div style="position: relative;">
+                            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text);">+381</span>
+                            <input type="tel" id="phone" name="phone" required pattern="[0-9]{6,10}" style="padding-left: 52px;">
+                        </div>
+                        <div class="error-message">Unesite validan broj telefona (6-10 cifara)</div>
+                    </div>
+                    <div class="form-field full-width">
+                        <button type="submit">Pošalji zahtev</button>
+                    </div>
+                    <div class="form-field full-width" style="text-align: center; margin-top: -10px; margin-bottom: 20px;">
+                        <a href="#" id="back-to-home" style="color: var(--text-light); text-decoration: none; font-size: 13px; font-family: 'Space Grotesk', sans-serif; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; transition: color 0.2s ease;">Nazad na početnu stranicu</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal HTML -->
+    <div class="modal" id="exit-modal">
+        <div class="modal-content">
+            <h3>Napustiti formu?</h3>
+            <p>Vaši podaci neće biti sačuvani i moraćete da počnete od početka.</p>
+            <div class="modal-buttons">
+                <button class="modal-button cancel">Otkaži</button>
+                <button class="modal-button proceed">Nastavi</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('details-form');
+            const phoneInput = document.getElementById('phone');
+            const backToHome = document.getElementById('back-to-home');
+            const modal = document.getElementById('exit-modal');
+            const movingDateSelect = document.getElementById('moving_date');
+            const datePickerContainer = document.getElementById('date_picker_container');
+            const specificDateInput = document.getElementById('specific_date');
+            
+            // Phone number validation
+            phoneInput.addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+                if (this.value.length > 10) {
+                    this.value = this.value.slice(0, 10);
+                }
+            });
+
+            // Back to home link hover effect
+            backToHome.addEventListener('mouseover', function() {
+                this.style.color = 'var(--primary)';
+            });
+            backToHome.addEventListener('mouseout', function() {
+                this.style.color = 'var(--text-light)';
+            });
+
+            // Modal functionality
+            backToHome.addEventListener('click', function(e) {
+                e.preventDefault();
+                modal.style.display = 'flex';
+            });
+
+            modal.querySelector('.cancel').addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+
+            modal.querySelector('.proceed').addEventListener('click', function() {
+                window.location.href = 'https://muvmi.rs';
+            });
+
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            // Date picker functionality
+            movingDateSelect.addEventListener('change', function() {
+                if (this.value === 'izaberite_datum') {
+                    datePickerContainer.style.display = '';
+                    specificDateInput.required = true;
+                    
+                    // Set min attribute to today's date
+                    const today = new Date();
+                    const yyyy = today.getFullYear();
+                    const mm = String(today.getMonth() + 1).padStart(2, '0');
+                    const dd = String(today.getDate()).padStart(2, '0');
+                    const formattedToday = `${yyyy}-${mm}-${dd}`;
+                    specificDateInput.min = formattedToday;
+                    
+                    // Format the date as DD/MM/YYYY when changed
+                    specificDateInput.addEventListener('change', function() {
+                        if (this.value) {
+                            const [year, month, day] = this.value.split('-');
+                            this.setAttribute('data-formatted-date', `${day}/${month}/${year}`);
+                        }
+                    });
+                } else {
+                    datePickerContainer.style.display = 'none';
+                    specificDateInput.required = false;
+                    specificDateInput.value = '';
+                }
+            });
+
+            // Form validation
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                let isValid = true;
+                
+                // Reset all error states
+                document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+                document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
+                
+                // Validate all required fields
+                const requiredFields = form.querySelectorAll('[required]');
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        isValid = false;
+                        field.classList.add('error');
+                        field.nextElementSibling.style.display = 'block';
+                    }
+                });
+                
+                // Validate date picker if visible
+                if (datePickerContainer.style.display !== 'none' && !specificDateInput.value) {
+                    isValid = false;
+                    specificDateInput.classList.add('error');
+                    specificDateInput.nextElementSibling.style.display = 'block';
+                }
+                
+                // Validate phone number
+                if (phoneInput.value.length < 6) {
+                    isValid = false;
+                    phoneInput.classList.add('error');
+                    phoneInput.nextElementSibling.style.display = 'block';
+                }
+                
+                if (!isValid) return;
+                
+                // Show loading state
+                const submitBtn = form.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Slanje...';
+                
+                // Prepare form data
+                const formData = new FormData(form);
+                const details = Object.fromEntries(formData);
+                
+                // Initialize EmailJS
+                emailjs.init("Psdc4pgmrFBYDPM_8");
+                
+                // Send email
+                emailjs.send("service_jmhj8ye", "template_j8ve8v6", {
+                    pickup_address: details.pickup_address,
+                    delivery_address: details.delivery_address,
+                    name: details.name,
+                    phone: details.phone,
+                    details: Object.entries(details)
+                        .filter(([key, value]) => {
+                            // Exclude these fields as they are handled separately
+                            const excludedFields = ['pickup_address', 'delivery_address', 'name', 'phone', 'category', 'pickup', 'delivery'];
+                            return !excludedFields.includes(key) && value && value.trim() !== '';
+                        })
+                        .map(([key, value]) => {
+                            // Format the field name for display
+                            const formattedKey = key
+                                .split('_')
+                                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                                .join(' ');
+                            
+                            // Special handling for date
+                            if (key === 'specific_date' && value) {
+                                const [year, month, day] = value.split('-');
+                                return `${formattedKey}: ${day}/${month}/${year}`;
+                            }
+                            
+                            // Special handling for select fields
+                            if (key === 'moving_date' && value === 'izaberite_datum' && details.specific_date) {
+                                const [year, month, day] = details.specific_date.split('-');
+                                return `${formattedKey}: ${day}/${month}/${year}`;
+                            }
+                            
+                            // Handle other select fields
+                            if (key === 'moving_date' && value !== 'izaberite_datum') {
+                                return `${formattedKey}: ${value.replace(/_/g, ' ')}`;
+                            }
+                            
+                            // Handle yes/no fields
+                            if (value === 'da' || value === 'ne') {
+                                return `${formattedKey}: ${value === 'da' ? 'Da' : 'Ne'}`;
+                            }
+                            
+                            return `${formattedKey}: ${value}`;
+                        })
+                        .join('\n')
+                })
+                .then(function() {
+                    window.location.href = 'thank-you.html';
+                })
+                .catch(function(error) {
+                    console.error('Error:', error);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Pošalji zahtev';
+                    alert('Došlo je do greške prilikom slanja zahteva. Molimo pokušajte ponovo.');
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

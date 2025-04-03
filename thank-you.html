@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hvala vam - Muvmi</title>
+    <style>
+        :root {
+            --primary: #F16622;
+            --primary-dark: #d14d0d;
+            --primary-light: #ff8f54;
+            --secondary: #F5F7FA;
+            --secondary-dark: #E4E7EB;
+            --text: #1F2937;
+            --text-light: #6B7280;
+            --white: #FFFFFF;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.05);
+            --border-radius-sm: 4px;
+            --border-radius-md: 6px;
+            --border-radius-lg: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--secondary);
+            color: var(--text);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .thank-you-card {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: 40px;
+        }
+
+        .logo {
+            width: 60px;
+            margin: 0 auto 20px;
+        }
+
+        .logo img {
+            width: 100%;
+            height: auto;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 16px;
+            color: var(--text);
+            font-family: 'Manrope', sans-serif;
+            font-weight: 700;
+        }
+
+        p {
+            color: var(--text-light);
+            font-size: 16px;
+            margin-bottom: 24px;
+        }
+
+        .phone-number {
+            display: inline-block;
+            background: var(--primary);
+            color: var(--white);
+            padding: 12px 24px;
+            border-radius: var(--border-radius-md);
+            font-size: 18px;
+            font-weight: 600;
+            margin: 20px 0;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+
+        .phone-number:hover {
+            background: var(--primary-dark);
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 20px;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--primary-dark);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .thank-you-card {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            p {
+                font-size: 15px;
+            }
+            
+            .phone-number {
+                font-size: 16px;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="thank-you-card">
+            <div class="logo">
+                <a href="https://muvmi.rs">
+                    <img src="IMAGES/muvmi-logo.webp" alt="Muvmi">
+                </a>
+            </div>
+            <h1>Hvala vam!</h1>
+            <p>Kontaktiraćemo vas u najkraćem roku.</p>
+            <p>Da potvrdite, pošaljite poruku na broj:</p>
+            <a href="tel:+381677109771" class="phone-number">+381 67 710 9771</a>
+            <a href="https://muvmi.rs" class="back-link">← Nazad na početnu stranicu</a>
+        </div>
+    </div>
+</body>
+</html> 
