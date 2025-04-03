@@ -661,7 +661,8 @@
                     
                     // Only make these specific fields optional
                     if (field.name === 'additional_details' || 
-                        field.name === 'special_instructions') {
+                        field.name === 'special_instructions' ||
+                        field.name === 'notes') {
                         field.required = false;
                     }
                 });
