@@ -940,7 +940,7 @@
                 let allFieldsFilled = true;
                 
                 requiredFields.forEach(field => {
-                    if (!field.value.trim()) {
+                    if (!field.value.trim() || (field.tagName === 'SELECT' && field.value === '')) {
                         allFieldsFilled = false;
                         field.style.borderColor = 'red';
                     } else {
@@ -1043,10 +1043,18 @@
                 input = document.createElement('select');
                 input.name = field.name;
                 input.required = field.required !== false;
-                field.options.forEach(opt => {
+                field.options.forEach((opt, idx) => {
                     const option = document.createElement('option');
-                    option.value = opt.toLowerCase().replace(/ /g, '_');
-                    option.textContent = opt;
+                    if (field.name === 'handling' && idx === 0) {
+                        option.value = '';
+                        option.textContent = opt;
+                        option.disabled = true;
+                        option.selected = true;
+                        option.hidden = true;
+                    } else {
+                        option.value = opt.toLowerCase().replace(/ /g, '_');
+                        option.textContent = opt;
+                    }
                     input.appendChild(option);
                 });
                 
