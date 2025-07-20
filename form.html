@@ -757,39 +757,11 @@
                     formGrid.appendChild(createFormField(fieldConfigs[i]));
                 }
             } else if (category === 'vehicles') {
-                // For vehicles category, create specific field groupings similar to moving
+                // Render all fields for vehicles in order, just like other categories
                 const fieldConfigs = formConfigs[category] || [];
-                
-                // First group: make and model in a row
-                const makeModelGroup = document.createElement('div');
-                makeModelGroup.className = 'field-group';
-                makeModelGroup.appendChild(createFormField(fieldConfigs[0])); // make
-                makeModelGroup.appendChild(createFormField(fieldConfigs[1])); // model
-                formGrid.appendChild(makeModelGroup);
-                
-                // Add drivable status
-                formGrid.appendChild(createFormField(fieldConfigs[2])); // drivable
-                
-                // Add transport method 
-                formGrid.appendChild(createFormField(fieldConfigs[3])); // transport_method
-                
-                // Add pickup access
-                formGrid.appendChild(createFormField(fieldConfigs[4])); // pickup_access
-                
-                // Add delivery access
-                formGrid.appendChild(createFormField(fieldConfigs[5])); // delivery_access
-                
-                // Add image upload (should be full width)
-                formGrid.appendChild(createFormField(fieldConfigs[6])); // images
-                
-                // Add special instructions (full width)
-                formGrid.appendChild(createFormField(fieldConfigs[7])); // special_instructions
-                
-                // Add additional details (full width)
-                formGrid.appendChild(createFormField(fieldConfigs[8])); // additional_details
-                
-                // Add moving date
-                formGrid.appendChild(createFormField(fieldConfigs[9])); // moving_date
+                fieldConfigs.forEach(field => {
+                    formGrid.appendChild(createFormField(field));
+                });
             } else if (category === 'furniture' || category === 'other' || category === 'boxes' || 
                        category === 'cargo' || category === 'vehicle_parts' || 
                        category === 'animals' || category === 'construction_waste' || category === 'construction_materials') {
