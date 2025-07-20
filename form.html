@@ -1072,7 +1072,10 @@
                                 depField.style.display = 'none';
                                 // Mark inputs as not required when hidden
                                 const inputs = depField.querySelectorAll('input, select, textarea');
-                                inputs.forEach(input => input.required = false);
+                                inputs.forEach(input => {
+                                    input.required = false;
+                                    input.style.borderColor = '';
+                                });
                             }
                         });
                     }
