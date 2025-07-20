@@ -48,6 +48,8 @@
             margin-bottom: 30px;
             padding-bottom: 20px;
             border-bottom: 1px solid var(--secondary-dark);
+            /* Remove any top shadow, add only bottom shadow if needed */
+            box-shadow: 0 4px 6px -4px rgba(0,0,0,0.05); /* Only bottom shadow */
         }
 
         .form-header-content {
@@ -829,40 +831,37 @@
             homeLinkDiv.appendChild(homeLink);
             formGrid.appendChild(homeLinkDiv);
             
-            // Add modal HTML
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.innerHTML = `
+            // Add modal HTML (already present for navigation confirmation)
+            // Add a new modal for submission feedback
+            const feedbackModal = document.createElement('div');
+            feedbackModal.className = 'modal';
+            feedbackModal.id = 'feedback-modal';
+            feedbackModal.innerHTML = `
                 <div class="modal-content">
-                    <h3>Napustiti formu?</h3>
-                    <p>Vaši podaci neće biti sačuvani i moraćete da počnete od početka.</p>
+                    <h3 id="feedback-modal-title"></h3>
+                    <p id="feedback-modal-message"></p>
                     <div class="modal-buttons">
-                        <button class="modal-button cancel">Otkaži</button>
-                        <button class="modal-button proceed">Nastavi</button>
+                        <button class="modal-button proceed" id="feedback-modal-ok">U redu</button>
                     </div>
                 </div>
             `;
-            document.body.appendChild(modal);
+            document.body.appendChild(feedbackModal);
 
-            // Modify home link click handler
-            homeLink.addEventListener('click', function(e) {
-                e.preventDefault();
-                modal.style.display = 'flex';
+            // Feedback modal close handler
+            document.getElementById('feedback-modal-ok').addEventListener('click', function() {
+                feedbackModal.style.display = 'none';
+                if (feedbackModal.dataset.success === 'true') {
+                    window.location.href = 'https://muvmi.rs';
+                }
             });
 
-            // Add modal button handlers
-            modal.querySelector('.cancel').addEventListener('click', function() {
-                modal.style.display = 'none';
-            });
-
-            modal.querySelector('.proceed').addEventListener('click', function() {
-                window.location.href = 'https://muvmi.rs';
-            });
-
-            // Close modal when clicking outside
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    modal.style.display = 'none';
+            // Also close modal when clicking outside
+            feedbackModal.addEventListener('click', function(e) {
+                if (e.target === feedbackModal) {
+                    feedbackModal.style.display = 'none';
+                    if (feedbackModal.dataset.success === 'true') {
+                        window.location.href = 'https://muvmi.rs';
+                    }
                 }
             });
             
@@ -948,8 +947,24 @@
                     }
                 });
                 
+                // Replace alert with custom modal for feedback
+                function showFeedbackModal(success, message) {
+                    const modal = document.getElementById('feedback-modal');
+                    const title = document.getElementById('feedback-modal-title');
+                    const msg = document.getElementById('feedback-modal-message');
+                    modal.dataset.success = success ? 'true' : 'false';
+                    if (success) {
+                        title.textContent = 'Uspešno poslato!';
+                        msg.textContent = message || 'Vaš zahtev je uspešno poslat! Kontaktiraćemo vas uskoro.';
+                    } else {
+                        title.textContent = 'Greška pri slanju';
+                        msg.textContent = message || 'Došlo je do greške prilikom slanja zahteva. Molimo pokušajte ponovo.';
+                    }
+                    modal.style.display = 'flex';
+                }
+                
                 if (!allFieldsFilled) {
-                    alert('Molimo popunite sva obavezna polja');
+                    showFeedbackModal(false, 'Molimo popunite sva obavezna polja.');
                     return;
                 }
                 
@@ -1000,10 +1015,9 @@
                 // Send email using EmailJS
                 emailjs.send("service_jmhj8ye", "template_j8ve8v6", finalData)
                     .then(function(response) {
-                        alert("Vaš zahtev je uspešno poslat! Kontaktiraćemo vas uskoro.");
-                        window.location.href = 'https://muvmi.rs';
+                        showFeedbackModal(true, 'Vaš zahtev je uspešno poslat! Kontaktiraćemo vas uskoro.');
                     }, function(error) {
-                        alert("Došlo je do greške prilikom slanja zahteva. Molimo pokušajte ponovo.");
+                        showFeedbackModal(false, 'Došlo je do greške prilikom slanja zahteva. Molimo pokušajte ponovo.');
                         console.error("EmailJS error:", error);
                     })
                     .finally(function() {
