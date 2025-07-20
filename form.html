@@ -1059,13 +1059,19 @@
                         dependentFields.forEach(depField => {
                             if (depField.dataset.dependsValue === value) {
                                 depField.style.display = '';
-                                
-                                // Mark inputs as required when shown
+                                // Mark inputs as required ONLY if config says so
                                 const inputs = depField.querySelectorAll('input, select, textarea');
-                                inputs.forEach(input => input.required = true);
+                                inputs.forEach(input => {
+                                    // Find the config for this field
+                                    const config = (formConfigs[category] || []).find(f => f.name === input.name);
+                                    if (config && config.required === false) {
+                                        input.required = false;
+                                    } else {
+                                        input.required = true;
+                                    }
+                                });
                             } else {
                                 depField.style.display = 'none';
-                                
                                 // Mark inputs as not required when hidden
                                 const inputs = depField.querySelectorAll('input, select, textarea');
                                 inputs.forEach(input => input.required = false);
