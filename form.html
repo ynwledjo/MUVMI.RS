@@ -957,7 +957,7 @@
                     modal.dataset.success = success ? 'true' : 'false';
                     if (success) {
                         title.textContent = 'Uspešno poslato!';
-                        msg.textContent = message || 'Vaš zahtev je uspešno poslat! Naš tim će vas kontaktirati u najkraćem mogućem roku radi potvrde. Hvala na ukazanom poverenju.';
+                        msg.textContent = message || 'Vaš zahtev je uspešno poslat! Kontaktiraćemo vas uskoro.';
                     } else {
                         title.textContent = 'Greška pri slanju';
                         msg.textContent = message || 'Došlo je do greške prilikom slanja zahteva. Molimo pokušajte ponovo.';
@@ -1002,13 +1002,17 @@
                 }
                 
                 // Combine with initial data
+                // Get and increment submission ID from localStorage
+                let submissionId = parseInt(localStorage.getItem('muvmi_submission_id') || '0', 10) + 1;
+                localStorage.setItem('muvmi_submission_id', submissionId);
                 const finalData = { 
                     ...window.moveData, 
                     name: details.name,
                     phone: details.phone,
                     pickup_address: details.pickup_address,
                     delivery_address: details.delivery_address,
-                    details: detailsString
+                    details: detailsString,
+                    submission_id: submissionId
                 };
                 
                 // Initialize EmailJS
