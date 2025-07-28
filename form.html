@@ -945,8 +945,18 @@
             termsLabel.style.fontFamily = 'Inter, sans-serif';
             termsLabel.innerHTML = 'Prihvatam <a href="#" style="color: var(--primary); text-decoration: underline;" target="_blank">uslove korišćenja</a>';
 
+            // Error message for terms
+            const termsError = document.createElement('div');
+            termsError.id = 'terms-error';
+            termsError.style.color = 'red';
+            termsError.style.fontSize = '13px';
+            termsError.style.marginLeft = '28px';
+            termsError.style.display = 'none';
+            termsError.textContent = 'Morate prihvatiti uslove korišćenja da biste poslali zahtev.';
+
             termsField.appendChild(termsCheckbox);
             termsField.appendChild(termsLabel);
+            termsField.appendChild(termsError);
             formGrid.insertBefore(termsField, submitDiv);
             
             formContainer.appendChild(formGrid);
@@ -962,22 +972,13 @@
             
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
-                // Check if terms are accepted
+                // Hide terms error initially
                 const termsCheckbox = document.getElementById('terms_checkbox');
-                const termsLabel = termsCheckbox.nextSibling;
-                if (!termsCheckbox.checked) {
-                    termsCheckbox.focus();
-                    termsLabel.style.color = 'red';
-                    showFeedbackModal(false, 'Morate prihvatiti uslove korišćenja da biste poslali zahtev.');
-                    return;
-                } else {
-                    termsLabel.style.color = 'var(--text)';
-                }
-                
+                const termsError = document.getElementById('terms-error');
+                termsError.style.display = 'none';
                 // Check if all required fields are filled
                 const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
                 let allFieldsFilled = true;
-                
                 requiredFields.forEach(field => {
                     if (!field.value.trim() || (field.tagName === 'SELECT' && field.value === '')) {
                         allFieldsFilled = false;
@@ -986,6 +987,16 @@
                         field.style.borderColor = '';
                     }
                 });
+                if (!allFieldsFilled) {
+                    showFeedbackModal(false, 'Molimo popunite sva obavezna polja.');
+                    return;
+                }
+                // Only now check terms
+                if (!termsCheckbox.checked) {
+                    termsError.style.display = 'block';
+                    termsCheckbox.focus();
+                    return;
+                }
                 
                 // Replace alert with custom modal for feedback
                 function showFeedbackModal(success, message) {
@@ -1001,11 +1012,6 @@
                         msg.textContent = message || 'Došlo je do greške prilikom slanja zahteva. Molimo pokušajte ponovo.';
                     }
                     modal.style.display = 'flex';
-                }
-                
-                if (!allFieldsFilled) {
-                    showFeedbackModal(false, 'Molimo popunite sva obavezna polja.');
-                    return;
                 }
                 
                 // Show loading state
