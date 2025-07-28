@@ -967,10 +967,10 @@
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 // Check if all required fields are filled
-                const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
+                const requiredFields = form.querySelectorAll('input[required], textarea[required]');
                 let allFieldsFilled = true;
                 requiredFields.forEach(field => {
-                    if (!field.value.trim() || (field.tagName === 'SELECT' && field.value === '')) {
+                    if (!field.value.trim()) {
                         allFieldsFilled = false;
                         field.style.borderColor = 'red';
                         // Add event listener to reset border color on input/change
@@ -1078,11 +1078,11 @@
 
             // After form is rendered, add blur listeners to all required fields for instant feedback
             setTimeout(function() {
-                const allRequired = form.querySelectorAll('input[required], select[required], textarea[required]');
+                const allRequired = form.querySelectorAll('input[required], textarea[required]');
                 allRequired.forEach(field => {
                     if (!field._hasBlurListener) {
                         field.addEventListener('blur', function() {
-                            if (!field.value.trim() || (field.tagName === 'SELECT' && field.value === '')) {
+                            if (!field.value.trim()) {
                                 field.style.borderColor = 'red';
                             }
                         });
@@ -1091,7 +1091,7 @@
                     // Add input/change listeners to reset border color as soon as the field is filled
                     if (!field._hasLiveResetListener) {
                         const resetBorder = function() {
-                            if (field.value.trim() && !(field.tagName === 'SELECT' && field.value === '')) {
+                            if (field.value.trim()) {
                                 field.style.borderColor = '';
                             }
                         };
@@ -1132,7 +1132,8 @@
             } else if (field.type === 'select') {
                 input = document.createElement('select');
                 input.name = field.name;
-                input.required = field.required !== false;
+                // Remove required attribute from all select fields
+                input.required = false;
                 field.options.forEach((opt, idx) => {
                     const option = document.createElement('option');
                     if (field.name === 'handling' && idx === 0) {
