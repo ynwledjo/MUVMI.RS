@@ -1172,6 +1172,9 @@
                                 inputs.forEach(input => {
                                     if (input.name === 'special_handling_equipment') {
                                         input.required = false;
+                                    } else if (input.tagName === 'SELECT') {
+                                        // Never make select fields required
+                                        input.required = false;
                                     } else {
                                         input.required = true;
                                     }
