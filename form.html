@@ -417,7 +417,7 @@
                     </a>
                 </div>
             </div>
-            <form id="details-form">
+            <form id="details-form" novalidate>
                 <!-- Add address fields at the top -->
                 <div class="form-grid">
                     <div class="form-field">
@@ -975,13 +975,25 @@
             
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
+                console.log('Form submission started');
+                
+                // Explicitly set all select fields to not required
+                const allSelects = form.querySelectorAll('select');
+                allSelects.forEach(select => {
+                    select.required = false;
+                    console.log('Set select field', select.name, 'to not required');
+                });
+                
                 // Check if all required fields are filled
                 const requiredFields = form.querySelectorAll('input[required], textarea[required]');
+                console.log('Required fields found:', requiredFields.length);
                 let allFieldsFilled = true;
                 requiredFields.forEach(field => {
+                    console.log('Checking field:', field.name, 'value:', field.value);
                     if (!field.value.trim()) {
                         allFieldsFilled = false;
                         field.style.borderColor = 'red';
+                        console.log('Field', field.name, 'is empty');
                         // Add event listener to reset border color on input/change
                         if (!field._hasResetListener) {
                             const resetBorder = function() {
@@ -995,6 +1007,7 @@
                         field.style.borderColor = '';
                     }
                 });
+                console.log('All fields filled:', allFieldsFilled);
                 if (!allFieldsFilled) {
                     showFeedbackModal(false, 'Molimo popunite sva obavezna polja.');
                     return;
