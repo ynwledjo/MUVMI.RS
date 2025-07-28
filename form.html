@@ -922,6 +922,33 @@
             phoneField.appendChild(phoneWrapper);
             formGrid.insertBefore(phoneField, submitDiv);
             
+            // Add checkbox for terms acceptance before the submit button
+            const termsField = document.createElement('div');
+            termsField.className = 'form-field full-width';
+            termsField.style.display = 'flex';
+            termsField.style.alignItems = 'center';
+            termsField.style.marginBottom = '10px';
+
+            const termsCheckbox = document.createElement('input');
+            termsCheckbox.type = 'checkbox';
+            termsCheckbox.id = 'terms_checkbox';
+            termsCheckbox.required = true;
+            termsCheckbox.style.marginRight = '10px';
+            termsCheckbox.style.width = '18px';
+            termsCheckbox.style.height = '18px';
+            termsCheckbox.style.accentColor = 'var(--primary)';
+
+            const termsLabel = document.createElement('label');
+            termsLabel.htmlFor = 'terms_checkbox';
+            termsLabel.style.fontSize = '14px';
+            termsLabel.style.color = 'var(--text)';
+            termsLabel.style.fontFamily = 'Inter, sans-serif';
+            termsLabel.innerHTML = 'Prihvatam <a href="#" style="color: var(--primary); text-decoration: underline;" target="_blank">uslove korišćenja</a>';
+
+            termsField.appendChild(termsCheckbox);
+            termsField.appendChild(termsLabel);
+            formGrid.insertBefore(termsField, submitDiv);
+            
             formContainer.appendChild(formGrid);
             
             // Handle form submission
@@ -935,6 +962,17 @@
             
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
+                // Check if terms are accepted
+                const termsCheckbox = document.getElementById('terms_checkbox');
+                const termsLabel = termsCheckbox.nextSibling;
+                if (!termsCheckbox.checked) {
+                    termsCheckbox.focus();
+                    termsLabel.style.color = 'red';
+                    showFeedbackModal(false, 'Morate prihvatiti uslove korišćenja da biste poslali zahtev.');
+                    return;
+                } else {
+                    termsLabel.style.color = 'var(--text)';
+                }
                 
                 // Check if all required fields are filled
                 const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
