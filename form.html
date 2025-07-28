@@ -654,42 +654,8 @@
               options: ['Lak pristup', 'Stepenice', 'Lift', 'Otežan pristup'] }
         ];
 
-        // For all fields in formConfigs, set required: true or required: false as appropriate
-        function updateRequiredFields() {
-            // Process each category in formConfigs
-            Object.keys(formConfigs).forEach(category => {
-                formConfigs[category].forEach(field => {
-                    // Set default to required
-                    field.required = true;
-                    
-                    // Only make these specific fields optional
-                    if (field.name === 'additional_details' || 
-                        field.name === 'special_instructions' ||
-                        field.name === 'notes') {
-                        field.required = false;
-                    }
-                    
-                    // Make all select fields not required
-                    if (field.type === 'select') {
-                        field.required = false;
-                    }
-                });
-            });
-            
-            // Also update common fields
-            commonFields.forEach(field => {
-                field.required = true;
-                // Make select fields in common fields not required too
-                if (field.type === 'select') {
-                    field.required = false;
-                }
-            });
-        }
-
         // Call this function immediately after the formConfigs definition
         document.addEventListener('DOMContentLoaded', function() {
-            // Update required attributes for all form fields
-            updateRequiredFields();
             
             // Get data from URL parameters
             const params = new URLSearchParams(window.location.search);
