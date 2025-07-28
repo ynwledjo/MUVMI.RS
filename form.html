@@ -973,6 +973,15 @@
                     if (!field.value.trim() || (field.tagName === 'SELECT' && field.value === '')) {
                         allFieldsFilled = false;
                         field.style.borderColor = 'red';
+                        // Add event listener to reset border color on input/change
+                        if (!field._hasResetListener) {
+                            const resetBorder = function() {
+                                field.style.borderColor = '';
+                            };
+                            field.addEventListener('input', resetBorder);
+                            field.addEventListener('change', resetBorder);
+                            field._hasResetListener = true;
+                        }
                     } else {
                         field.style.borderColor = '';
                     }
