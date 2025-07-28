@@ -1088,6 +1088,17 @@
                         });
                         field._hasBlurListener = true;
                     }
+                    // Add input/change listeners to reset border color as soon as the field is filled
+                    if (!field._hasLiveResetListener) {
+                        const resetBorder = function() {
+                            if (field.value.trim() && !(field.tagName === 'SELECT' && field.value === '')) {
+                                field.style.borderColor = '';
+                            }
+                        };
+                        field.addEventListener('input', resetBorder);
+                        field.addEventListener('change', resetBorder);
+                        field._hasLiveResetListener = true;
+                    }
                 });
             }, 0);
         }
