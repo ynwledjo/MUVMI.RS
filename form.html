@@ -927,36 +927,30 @@
             termsField.className = 'form-field full-width';
             termsField.style.display = 'flex';
             termsField.style.alignItems = 'center';
+            termsField.style.gap = '10px';
             termsField.style.marginBottom = '10px';
 
             const termsCheckbox = document.createElement('input');
             termsCheckbox.type = 'checkbox';
             termsCheckbox.id = 'terms_checkbox';
             termsCheckbox.required = true;
-            termsCheckbox.style.marginRight = '10px';
             termsCheckbox.style.width = '18px';
             termsCheckbox.style.height = '18px';
             termsCheckbox.style.accentColor = 'var(--primary)';
+            termsCheckbox.style.margin = '0';
+            termsCheckbox.style.verticalAlign = 'middle';
 
             const termsLabel = document.createElement('label');
             termsLabel.htmlFor = 'terms_checkbox';
             termsLabel.style.fontSize = '14px';
             termsLabel.style.color = 'var(--text)';
             termsLabel.style.fontFamily = 'Inter, sans-serif';
+            termsLabel.style.margin = '0';
+            termsLabel.style.verticalAlign = 'middle';
             termsLabel.innerHTML = 'Prihvatam <a href="#" style="color: var(--primary); text-decoration: underline;" target="_blank">uslove korišćenja</a>';
-
-            // Error message for terms
-            const termsError = document.createElement('div');
-            termsError.id = 'terms-error';
-            termsError.style.color = 'red';
-            termsError.style.fontSize = '13px';
-            termsError.style.marginLeft = '28px';
-            termsError.style.display = 'none';
-            termsError.textContent = 'Morate prihvatiti uslove korišćenja da biste poslali zahtev.';
 
             termsField.appendChild(termsCheckbox);
             termsField.appendChild(termsLabel);
-            termsField.appendChild(termsError);
             formGrid.insertBefore(termsField, submitDiv);
             
             formContainer.appendChild(formGrid);
@@ -972,10 +966,6 @@
             
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
-                // Hide terms error initially
-                const termsCheckbox = document.getElementById('terms_checkbox');
-                const termsError = document.getElementById('terms-error');
-                termsError.style.display = 'none';
                 // Check if all required fields are filled
                 const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
                 let allFieldsFilled = true;
@@ -992,8 +982,9 @@
                     return;
                 }
                 // Only now check terms
+                const termsCheckbox = document.getElementById('terms_checkbox');
                 if (!termsCheckbox.checked) {
-                    termsError.style.display = 'block';
+                    showFeedbackModal(false, 'Morate prihvatiti uslove korišćenja da biste poslali zahtev.');
                     termsCheckbox.focus();
                     return;
                 }
