@@ -668,12 +668,21 @@
                         field.name === 'notes') {
                         field.required = false;
                     }
+                    
+                    // Make all select fields not required
+                    if (field.type === 'select') {
+                        field.required = false;
+                    }
                 });
             });
             
             // Also update common fields
             commonFields.forEach(field => {
                 field.required = true;
+                // Make select fields in common fields not required too
+                if (field.type === 'select') {
+                    field.required = false;
+                }
             });
         }
 
