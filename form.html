@@ -1075,6 +1075,21 @@
                         submitBtn.disabled = false;
                     });
             });
+
+            // After form is rendered, add blur listeners to all required fields for instant feedback
+            setTimeout(function() {
+                const allRequired = form.querySelectorAll('input[required], select[required], textarea[required]');
+                allRequired.forEach(field => {
+                    if (!field._hasBlurListener) {
+                        field.addEventListener('blur', function() {
+                            if (!field.value.trim() || (field.tagName === 'SELECT' && field.value === '')) {
+                                field.style.borderColor = 'red';
+                            }
+                        });
+                        field._hasBlurListener = true;
+                    }
+                });
+            }, 0);
         }
 
         function createFormField(field) {
