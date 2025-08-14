@@ -445,7 +445,7 @@
                   options: ['Kuća', 'Stan', 'Duplex', 'Vikendica', 'Kancelarija', 'Drugo'] },
                 { type: 'select', name: 'largest_item_size', label: 'Cela pošiljka staje u', required: false,
                   options: ['Auto', 'Kombi', 'Kamion'] },
-                { type: 'number', name: 'item_count', label: 'Broj predmeta' },
+                { type: 'number', name: 'item_count', label: 'Broj predmeta', min: 1, max: 99 },
                 { type: 'select', name: 'assembly_needed', label: 'Da li je potrebna demontaža', required: false,
                   options: ['Ne', 'Da'] },
                 { type: 'select', name: 'disassembly_needed', label: 'Da li je potrebna montaža', required: false,
@@ -1324,115 +1324,113 @@
                 input.type = field.type;
                 input.name = field.name;
                 input.required = field.required !== false;
+                
+                // Add min and max attributes for number fields
+                if (field.type === 'number') {
+                    if (field.min !== undefined) input.min = field.min;
+                    if (field.max !== undefined) input.max = field.max;
+                }
             }
             
             fieldDiv.appendChild(input);
             return fieldDiv;
         }
 
-        // Function to add dynamic item fields for furniture category
-        function addDynamicItemFields(formGrid, itemCountFieldName) {
-            const itemCountInput = document.querySelector(`input[name="${itemCountFieldName}"]`);
-            if (!itemCountInput) return;
-
-            // Create container for dynamic fields
+        // Function to create dynamic fields container for furniture category
+        function createDynamicFieldsContainer() {
             const dynamicContainer = document.createElement('div');
             dynamicContainer.id = 'dynamic-item-fields';
             dynamicContainer.className = 'form-field full-width';
-            formGrid.appendChild(dynamicContainer);
+            return dynamicContainer;
+        }
 
-            // Function to update dynamic fields
-            function updateDynamicFields() {
-                const count = parseInt(itemCountInput.value) || 0;
-                dynamicContainer.innerHTML = '';
+        // Function to update dynamic fields for furniture category
+        function updateDynamicFields(dynamicContainer, itemCountInput) {
+            const count = parseInt(itemCountInput.value) || 0;
+            dynamicContainer.innerHTML = '';
 
-                if (count > 0) {
-                    for (let i = 1; i <= count; i++) {
-                        const itemGroup = document.createElement('div');
-                        itemGroup.className = 'item-group';
-                        itemGroup.style.marginBottom = '20px';
-                        itemGroup.style.padding = '15px';
-                        itemGroup.style.border = '1px solid var(--secondary-light)';
-                        itemGroup.style.borderRadius = '8px';
-                        itemGroup.style.backgroundColor = 'var(--background-light)';
+            if (count > 0) {
+                for (let i = 1; i <= count; i++) {
+                    const itemGroup = document.createElement('div');
+                    itemGroup.className = 'item-group';
+                    itemGroup.style.marginBottom = '20px';
+                    itemGroup.style.padding = '15px';
+                    itemGroup.style.border = '1px solid var(--secondary-light)';
+                    itemGroup.style.borderRadius = '8px';
+                    itemGroup.style.backgroundColor = 'var(--background-light)';
 
-                        // Item name field
-                        const itemNameField = document.createElement('div');
-                        itemNameField.className = 'form-field';
-                        const itemNameLabel = document.createElement('label');
-                        itemNameLabel.innerHTML = `Predmet ${i} <span>(npr. kauc)</span>`;
-                        const itemNameInput = document.createElement('input');
-                        itemNameInput.type = 'text';
-                        itemNameInput.name = `item_${i}_name`;
-                        itemNameInput.required = true;
-                        itemNameField.appendChild(itemNameLabel);
-                        itemNameField.appendChild(itemNameInput);
+                    // Item name field
+                    const itemNameField = document.createElement('div');
+                    itemNameField.className = 'form-field';
+                    const itemNameLabel = document.createElement('label');
+                    itemNameLabel.innerHTML = `Predmet ${i} <span>(npr. kauc)</span>`;
+                    const itemNameInput = document.createElement('input');
+                    itemNameInput.type = 'text';
+                    itemNameInput.name = `item_${i}_name`;
+                    itemNameInput.required = true;
+                    itemNameField.appendChild(itemNameLabel);
+                    itemNameField.appendChild(itemNameInput);
 
-                        // Dimensions group
-                        const dimensionsGroup = document.createElement('div');
-                        dimensionsGroup.className = 'field-group';
-                        dimensionsGroup.style.marginTop = '10px';
+                    // Dimensions group
+                    const dimensionsGroup = document.createElement('div');
+                    dimensionsGroup.className = 'field-group';
+                    dimensionsGroup.style.marginTop = '10px';
 
-                        // Length field
-                        const lengthField = document.createElement('div');
-                        lengthField.className = 'form-field';
-                        const lengthLabel = document.createElement('label');
-                        lengthLabel.innerHTML = 'Dimenzije <span>(Dužina)</span>';
-                        const lengthInput = document.createElement('input');
-                        lengthInput.type = 'number';
-                        lengthInput.name = `item_${i}_length`;
-                        lengthInput.placeholder = 'cm';
-                        lengthInput.required = true;
-                        lengthField.appendChild(lengthLabel);
-                        lengthField.appendChild(lengthInput);
+                    // Length field
+                    const lengthField = document.createElement('div');
+                    lengthField.className = 'form-field';
+                    const lengthLabel = document.createElement('label');
+                    lengthLabel.innerHTML = 'Dimenzije <span>(Dužina)</span>';
+                    const lengthInput = document.createElement('input');
+                    lengthInput.type = 'number';
+                    lengthInput.name = `item_${i}_length`;
+                    lengthInput.placeholder = 'cm';
+                    lengthInput.required = true;
+                    lengthInput.min = '1';
+                    lengthField.appendChild(lengthLabel);
+                    lengthField.appendChild(lengthInput);
 
-                        // Width field
-                        const widthField = document.createElement('div');
-                        widthField.className = 'form-field';
-                        const widthLabel = document.createElement('label');
-                        widthLabel.innerHTML = 'Dimenzije <span>(Širina)</span>';
-                        const widthInput = document.createElement('input');
-                        widthInput.type = 'number';
-                        widthInput.name = `item_${i}_width`;
-                        widthInput.placeholder = 'cm';
-                        widthInput.required = true;
-                        widthField.appendChild(widthLabel);
-                        widthField.appendChild(widthInput);
+                    // Width field
+                    const widthField = document.createElement('div');
+                    widthField.className = 'form-field';
+                    const widthLabel = document.createElement('label');
+                    widthLabel.innerHTML = 'Dimenzije <span>(Širina)</span>';
+                    const widthInput = document.createElement('input');
+                    widthInput.type = 'number';
+                    widthInput.name = `item_${i}_width`;
+                    widthInput.placeholder = 'cm';
+                    widthInput.required = true;
+                    widthInput.min = '1';
+                    widthField.appendChild(widthLabel);
+                    widthField.appendChild(widthInput);
 
-                        // Height field
-                        const heightField = document.createElement('div');
-                        heightField.className = 'form-field';
-                        const heightLabel = document.createElement('label');
-                        heightLabel.innerHTML = 'Dimenzije <span>(Visina)</span>';
-                        const heightInput = document.createElement('input');
-                        heightInput.type = 'number';
-                        heightInput.name = `item_${i}_height`;
-                        heightInput.placeholder = 'cm';
-                        heightInput.required = true;
-                        heightField.appendChild(heightLabel);
-                        heightField.appendChild(heightInput);
+                    // Height field
+                    const heightField = document.createElement('div');
+                    heightField.className = 'form-field';
+                    const heightLabel = document.createElement('label');
+                    heightLabel.innerHTML = 'Dimenzije <span>(Visina)</span>';
+                    const heightInput = document.createElement('input');
+                    heightInput.type = 'number';
+                    heightInput.name = `item_${i}_height`;
+                    heightInput.placeholder = 'cm';
+                    heightInput.required = true;
+                    heightInput.min = '1';
+                    heightField.appendChild(heightLabel);
+                    heightField.appendChild(heightInput);
 
-                        // Add all fields to the group
-                        dimensionsGroup.appendChild(lengthField);
-                        dimensionsGroup.appendChild(widthField);
-                        dimensionsGroup.appendChild(heightField);
+                    // Add all fields to the group
+                    dimensionsGroup.appendChild(lengthField);
+                    dimensionsGroup.appendChild(widthField);
+                    dimensionsGroup.appendChild(heightField);
 
-                        // Add to item group
-                        itemGroup.appendChild(itemNameField);
-                        itemGroup.appendChild(dimensionsGroup);
+                    // Add to item group
+                    itemGroup.appendChild(itemNameField);
+                    itemGroup.appendChild(dimensionsGroup);
 
-                        // Add to dynamic container
-                        dynamicContainer.appendChild(itemGroup);
-                    }
+                    // Add to dynamic container
+                    dynamicContainer.appendChild(itemGroup);
                 }
             }
-
-            // Add event listener to item count input
-            itemCountInput.addEventListener('input', updateDynamicFields);
-            itemCountInput.addEventListener('change', updateDynamicFields);
-
-            // Initial call to set up fields if there's already a value
-            updateDynamicFields();
         }
 
         // Function to create an image upload box
