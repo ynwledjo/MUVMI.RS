@@ -700,33 +700,33 @@
             if (category === 'moving') {
                 const fieldConfigs = formConfigs[category] || [];
                 
-                // First group: property types (already in pairs by default in the grid)
-                formGrid.appendChild(createFormField(fieldConfigs[0])); // property_type_pickup
-                formGrid.appendChild(createFormField(fieldConfigs[1])); // property_type_delivery
+                // Add description field first (full width)
+                formGrid.appendChild(createFormField(fieldConfigs[0])); // description
                 
-                // Second group: floor levels - create a grouped row
+                // Second group: property types (already in pairs by default in the grid)
+                formGrid.appendChild(createFormField(fieldConfigs[1])); // property_type_pickup
+                formGrid.appendChild(createFormField(fieldConfigs[2])); // property_type_delivery
+                
+                // Third group: floor levels - create a grouped row
                 const floorGroup = document.createElement('div');
                 floorGroup.className = 'field-group';
-                floorGroup.appendChild(createFormField(fieldConfigs[2])); // pickup_floor
-                floorGroup.appendChild(createFormField(fieldConfigs[3])); // delivery_floor
+                floorGroup.appendChild(createFormField(fieldConfigs[3])); // pickup_floor
+                floorGroup.appendChild(createFormField(fieldConfigs[4])); // delivery_floor
                 formGrid.appendChild(floorGroup);
                 
-                // Third group: elevator access - create a grouped row
+                // Fourth group: elevator access - create a grouped row
                 const elevatorGroup = document.createElement('div');
                 elevatorGroup.className = 'field-group';
-                elevatorGroup.appendChild(createFormField(fieldConfigs[4])); // has_elevator_pickup
-                elevatorGroup.appendChild(createFormField(fieldConfigs[5])); // has_elevator_delivery
+                elevatorGroup.appendChild(createFormField(fieldConfigs[5])); // has_elevator_pickup
+                elevatorGroup.appendChild(createFormField(fieldConfigs[6])); // has_elevator_delivery
                 formGrid.appendChild(elevatorGroup);
                 
-                // Fourth group: parking info - create a grouped row
+                // Fifth group: parking info - create a grouped row
                 const parkingGroup = document.createElement('div');
                 parkingGroup.className = 'field-group';
-                parkingGroup.appendChild(createFormField(fieldConfigs[6])); // parking_info_pickup
-                parkingGroup.appendChild(createFormField(fieldConfigs[7])); // parking_info_delivery
+                parkingGroup.appendChild(createFormField(fieldConfigs[7])); // parking_info_pickup
+                parkingGroup.appendChild(createFormField(fieldConfigs[8])); // parking_info_delivery
                 formGrid.appendChild(parkingGroup);
-                
-                // Image upload should be full width due to its special display requirements
-                formGrid.appendChild(createFormField(fieldConfigs[8])); // images
                 
                 // Add number of rooms as a regular field
                 formGrid.appendChild(createFormField(fieldConfigs[9])); // number_of_rooms
