@@ -445,7 +445,7 @@
                   options: ['Kuća', 'Stan', 'Duplex', 'Vikendica', 'Kancelarija', 'Drugo'] },
                 { type: 'select', name: 'largest_item_size', label: 'Cela pošiljka staje u', required: false,
                   options: ['Auto', 'Kombi', 'Kamion'] },
-                { type: 'number', name: 'item_count', label: 'Broj predmeta', min: 1, max: 99 },
+                { type: 'number', name: 'item_count', label: 'Broj predmeta', max: 99 },
                 { type: 'select', name: 'assembly_needed', label: 'Da li je potrebna demontaža', required: false,
                   options: ['Ne', 'Da'] },
                 { type: 'select', name: 'disassembly_needed', label: 'Da li je potrebna montaža', required: false,
@@ -781,31 +781,7 @@
                 fieldConfigs.forEach(field => {
                     formGrid.appendChild(createFormField(field));
                 });
-            } else if (category === 'furniture') {
-                // Handle furniture category with dynamic item fields
-                const fieldConfigs = formConfigs[category] || [];
-                
-                // Add description field first if it exists
-                const descriptionField = fieldConfigs.find(field => field.name === 'description');
-                if (descriptionField) {
-                    formGrid.appendChild(createFormField(descriptionField));
-                }
-                
-                // Add fields one by one to control positioning
-                for (let i = 0; i < fieldConfigs.length; i++) {
-                    const field = fieldConfigs[i];
-                    if (field.name !== 'description') {
-                        formGrid.appendChild(createFormField(field));
-                        
-                        // If this is the item_count field, add dynamic fields right after it
-                        if (field.name === 'item_count') {
-                            // Add dynamic item fields container immediately after item_count
-                            addDynamicItemFields(formGrid, 'item_count');
-                        }
-                    }
-                }
-                
-            } else if (category === 'other' || category === 'boxes' || 
+            } else if (category === 'furniture' || category === 'other' || category === 'boxes' || 
                        category === 'cargo' || category === 'vehicle_parts' || 
                        category === 'animals' || category === 'construction_waste' || category === 'construction_materials') {
                 // Handle all fields consistently
@@ -1325,112 +1301,26 @@
                 input.name = field.name;
                 input.required = field.required !== false;
                 
-                // Add min and max attributes for number fields
-                if (field.type === 'number') {
-                    if (field.min !== undefined) input.min = field.min;
-                    if (field.max !== undefined) input.max = field.max;
+                // Add max attribute if specified
+                if (field.max) {
+                    input.max = field.max;
                 }
+            }
+            
+            // Special handling for furniture item_count field
+            if (field.name === 'item_count' && window.moveData && window.moveData.category === 'furniture') {
+                input.addEventListener('input', function() {
+                    const count = parseInt(this.value) || 0;
+                    if (count > 0 && count <= 99) {
+                        generateItemFields(count, fieldDiv);
+                    } else {
+                        removeItemFields(fieldDiv);
+                    }
+                });
             }
             
             fieldDiv.appendChild(input);
             return fieldDiv;
-        }
-
-        // Function to create dynamic fields container for furniture category
-        function createDynamicFieldsContainer() {
-            const dynamicContainer = document.createElement('div');
-            dynamicContainer.id = 'dynamic-item-fields';
-            dynamicContainer.className = 'form-field full-width';
-            return dynamicContainer;
-        }
-
-        // Function to update dynamic fields for furniture category
-        function updateDynamicFields(dynamicContainer, itemCountInput) {
-            const count = parseInt(itemCountInput.value) || 0;
-            dynamicContainer.innerHTML = '';
-
-            if (count > 0) {
-                for (let i = 1; i <= count; i++) {
-                    const itemGroup = document.createElement('div');
-                    itemGroup.className = 'item-group';
-                    itemGroup.style.marginBottom = '20px';
-                    itemGroup.style.padding = '15px';
-                    itemGroup.style.border = '1px solid var(--secondary-light)';
-                    itemGroup.style.borderRadius = '8px';
-                    itemGroup.style.backgroundColor = 'var(--background-light)';
-
-                    // Item name field
-                    const itemNameField = document.createElement('div');
-                    itemNameField.className = 'form-field';
-                    const itemNameLabel = document.createElement('label');
-                    itemNameLabel.innerHTML = `Predmet ${i} <span>(npr. kauc)</span>`;
-                    const itemNameInput = document.createElement('input');
-                    itemNameInput.type = 'text';
-                    itemNameInput.name = `item_${i}_name`;
-                    itemNameInput.required = true;
-                    itemNameField.appendChild(itemNameLabel);
-                    itemNameField.appendChild(itemNameInput);
-
-                    // Dimensions group
-                    const dimensionsGroup = document.createElement('div');
-                    dimensionsGroup.className = 'field-group';
-                    dimensionsGroup.style.marginTop = '10px';
-
-                    // Length field
-                    const lengthField = document.createElement('div');
-                    lengthField.className = 'form-field';
-                    const lengthLabel = document.createElement('label');
-                    lengthLabel.innerHTML = 'Dimenzije <span>(Dužina)</span>';
-                    const lengthInput = document.createElement('input');
-                    lengthInput.type = 'number';
-                    lengthInput.name = `item_${i}_length`;
-                    lengthInput.placeholder = 'cm';
-                    lengthInput.required = true;
-                    lengthInput.min = '1';
-                    lengthField.appendChild(lengthLabel);
-                    lengthField.appendChild(lengthInput);
-
-                    // Width field
-                    const widthField = document.createElement('div');
-                    widthField.className = 'form-field';
-                    const widthLabel = document.createElement('label');
-                    widthLabel.innerHTML = 'Dimenzije <span>(Širina)</span>';
-                    const widthInput = document.createElement('input');
-                    widthInput.type = 'number';
-                    widthInput.name = `item_${i}_width`;
-                    widthInput.placeholder = 'cm';
-                    widthInput.required = true;
-                    widthInput.min = '1';
-                    widthField.appendChild(widthLabel);
-                    widthField.appendChild(widthInput);
-
-                    // Height field
-                    const heightField = document.createElement('div');
-                    heightField.className = 'form-field';
-                    const heightLabel = document.createElement('label');
-                    heightLabel.innerHTML = 'Dimenzije <span>(Visina)</span>';
-                    const heightInput = document.createElement('input');
-                    heightInput.type = 'number';
-                    heightInput.name = `item_${i}_height`;
-                    heightInput.placeholder = 'cm';
-                    heightInput.required = true;
-                    heightInput.min = '1';
-                    heightField.appendChild(heightLabel);
-                    heightField.appendChild(heightInput);
-
-                    // Add all fields to the group
-                    dimensionsGroup.appendChild(lengthField);
-                    dimensionsGroup.appendChild(widthField);
-                    dimensionsGroup.appendChild(heightField);
-
-                    // Add to item group
-                    itemGroup.appendChild(itemNameField);
-                    itemGroup.appendChild(dimensionsGroup);
-
-                    // Add to dynamic container
-                    dynamicContainer.appendChild(itemGroup);
-                }
-            }
         }
 
         // Function to create an image upload box
@@ -1550,6 +1440,98 @@
                 });
             };
             reader.readAsDataURL(file);
+        }
+        
+        // Function to generate item fields for furniture category
+        function generateItemFields(count, fieldDiv) {
+            // Remove existing item fields first
+            removeItemFields(fieldDiv);
+            
+            // Create container for item fields
+            const itemContainer = document.createElement('div');
+            itemContainer.className = 'item-fields-container';
+            itemContainer.style.marginTop = '20px';
+            
+            for (let i = 1; i <= count; i++) {
+                // Create item section
+                const itemSection = document.createElement('div');
+                itemSection.className = 'item-section';
+                itemSection.style.marginBottom = '20px';
+                itemSection.style.padding = '15px';
+                itemSection.style.border = '1px solid var(--secondary-light)';
+                itemSection.style.borderRadius = '8px';
+                itemSection.style.backgroundColor = 'var(--background-light)';
+                
+                // Item title
+                const itemTitle = document.createElement('h4');
+                itemTitle.textContent = `Predmet ${i} (npr. kauc)`;
+                itemTitle.style.margin = '0 0 15px 0';
+                itemTitle.style.color = 'var(--text)';
+                itemTitle.style.fontSize = '16px';
+                itemTitle.style.fontWeight = '600';
+                itemSection.appendChild(itemTitle);
+                
+                // Create grid for dimensions
+                const dimensionsGrid = document.createElement('div');
+                dimensionsGrid.className = 'dimensions-grid';
+                dimensionsGrid.style.display = 'grid';
+                dimensionsGrid.style.gridTemplateColumns = '1fr 1fr 1fr';
+                dimensionsGrid.style.gap = '15px';
+                
+                // Dužina field
+                const lengthField = createDimensionField(`item_${i}_length`, 'Dužina (cm)', 'number');
+                dimensionsGrid.appendChild(lengthField);
+                
+                // Širina field
+                const widthField = createDimensionField(`item_${i}_width`, 'Širina (cm)', 'number');
+                dimensionsGrid.appendChild(widthField);
+                
+                // Visina field
+                const heightField = createDimensionField(`item_${i}_height`, 'Visina (cm)', 'number');
+                dimensionsGrid.appendChild(heightField);
+                
+                itemSection.appendChild(dimensionsGrid);
+                itemContainer.appendChild(itemSection);
+            }
+            
+            // Insert after the current field
+            fieldDiv.parentNode.insertBefore(itemContainer, fieldDiv.nextSibling);
+        }
+        
+        // Function to remove item fields
+        function removeItemFields(fieldDiv) {
+            const existingContainer = fieldDiv.parentNode.querySelector('.item-fields-container');
+            if (existingContainer) {
+                existingContainer.remove();
+            }
+        }
+        
+        // Function to create dimension field
+        function createDimensionField(name, label, type) {
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'form-field';
+            
+            const labelElement = document.createElement('label');
+            labelElement.textContent = label;
+            labelElement.style.fontSize = '14px';
+            labelElement.style.color = 'var(--text)';
+            labelElement.style.marginBottom = '5px';
+            labelElement.style.display = 'block';
+            
+            const input = document.createElement('input');
+            input.type = type;
+            input.name = name;
+            input.required = true;
+            input.style.width = '100%';
+            input.style.padding = '8px 12px';
+            input.style.border = '1px solid var(--secondary-light)';
+            input.style.borderRadius = '4px';
+            input.style.fontSize = '14px';
+            
+            fieldDiv.appendChild(labelElement);
+            fieldDiv.appendChild(input);
+            
+            return fieldDiv;
         }
     </script>
 </body>
