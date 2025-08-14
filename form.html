@@ -446,7 +446,6 @@
                 { type: 'select', name: 'largest_item_size', label: 'Cela pošiljka staje u', required: false,
                   options: ['Auto', 'Kombi', 'Kamion'] },
                 { type: 'number', name: 'item_count', label: 'Broj predmeta' },
-                { type: 'textarea', name: 'item_list', label: 'Nabroji predmete', fullWidth: true },
                 { type: 'select', name: 'assembly_needed', label: 'Da li je potrebna demontaža', required: false,
                   options: ['Ne', 'Da'] },
                 { type: 'select', name: 'disassembly_needed', label: 'Da li je potrebna montaža', required: false,
@@ -792,17 +791,19 @@
                     formGrid.appendChild(createFormField(descriptionField));
                 }
                 
-                // Add all other fields except description
-                fieldConfigs.forEach(field => {
+                // Add fields one by one to control positioning
+                for (let i = 0; i < fieldConfigs.length; i++) {
+                    const field = fieldConfigs[i];
                     if (field.name !== 'description') {
                         formGrid.appendChild(createFormField(field));
+                        
+                        // If this is the item_count field, add dynamic fields right after it
+                        if (field.name === 'item_count') {
+                            // Add dynamic item fields container immediately after item_count
+                            addDynamicItemFields(formGrid, 'item_count');
+                        }
                     }
-                });
-                
-                // Add dynamic item fields container after the form is rendered
-                setTimeout(() => {
-                    addDynamicItemFields(formGrid, 'item_count');
-                }, 0);
+                }
                 
             } else if (category === 'other' || category === 'boxes' || 
                        category === 'cargo' || category === 'vehicle_parts' || 
@@ -1363,7 +1364,7 @@
                         const itemNameInput = document.createElement('input');
                         itemNameInput.type = 'text';
                         itemNameInput.name = `item_${i}_name`;
-                        itemNameInput.required = false;
+                        itemNameInput.required = true;
                         itemNameField.appendChild(itemNameLabel);
                         itemNameField.appendChild(itemNameInput);
 
@@ -1381,7 +1382,7 @@
                         lengthInput.type = 'number';
                         lengthInput.name = `item_${i}_length`;
                         lengthInput.placeholder = 'cm';
-                        lengthInput.required = false;
+                        lengthInput.required = true;
                         lengthField.appendChild(lengthLabel);
                         lengthField.appendChild(lengthInput);
 
@@ -1394,7 +1395,7 @@
                         widthInput.type = 'number';
                         widthInput.name = `item_${i}_width`;
                         widthInput.placeholder = 'cm';
-                        widthInput.required = false;
+                        widthInput.required = true;
                         widthField.appendChild(widthLabel);
                         widthField.appendChild(widthInput);
 
@@ -1407,7 +1408,7 @@
                         heightInput.type = 'number';
                         heightInput.name = `item_${i}_height`;
                         heightInput.placeholder = 'cm';
-                        heightInput.required = false;
+                        heightInput.required = true;
                         heightField.appendChild(heightLabel);
                         heightField.appendChild(heightInput);
 
