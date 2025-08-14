@@ -1305,18 +1305,18 @@
                 if (field.max) {
                     input.max = field.max;
                 }
-            }
-            
-            // Special handling for furniture item_count field
-            if (field.name === 'item_count' && window.moveData && window.moveData.category === 'furniture') {
-                input.addEventListener('input', function() {
-                    const count = parseInt(this.value) || 0;
-                    if (count > 0 && count <= 99) {
-                        generateItemFields(count, fieldDiv);
-                    } else {
-                        removeItemFields(fieldDiv);
-                    }
-                });
+                
+                // Special handling for furniture item_count field
+                if (field.name === 'item_count') {
+                    input.addEventListener('input', function() {
+                        const count = parseInt(this.value) || 0;
+                        if (count > 0 && count <= 99) {
+                            createItemFields(count, fieldDiv);
+                        } else {
+                            removeItemFields(fieldDiv);
+                        }
+                    });
+                }
             }
             
             fieldDiv.appendChild(input);
@@ -1442,8 +1442,8 @@
             reader.readAsDataURL(file);
         }
         
-        // Function to generate item fields for furniture category
-        function generateItemFields(count, fieldDiv) {
+        // Function to create item fields for furniture category
+        function createItemFields(count, fieldDiv) {
             // Remove existing item fields first
             removeItemFields(fieldDiv);
             
@@ -1456,8 +1456,8 @@
                 // Create item section
                 const itemSection = document.createElement('div');
                 itemSection.className = 'item-section';
-                itemSection.style.marginBottom = '20px';
-                itemSection.style.padding = '15px';
+                itemSection.style.marginBottom = '30px';
+                itemSection.style.padding = '20px';
                 itemSection.style.border = '1px solid var(--secondary-light)';
                 itemSection.style.borderRadius = '8px';
                 itemSection.style.backgroundColor = 'var(--background-light)';
@@ -1465,37 +1465,88 @@
                 // Item title
                 const itemTitle = document.createElement('h4');
                 itemTitle.textContent = `Predmet ${i} (npr. kauc)`;
-                itemTitle.style.margin = '0 0 15px 0';
+                itemTitle.style.margin = '0 0 20px 0';
                 itemTitle.style.color = 'var(--text)';
                 itemTitle.style.fontSize = '16px';
                 itemTitle.style.fontWeight = '600';
                 itemSection.appendChild(itemTitle);
                 
-                // Create grid for dimensions
-                const dimensionsGrid = document.createElement('div');
-                dimensionsGrid.className = 'dimensions-grid';
-                dimensionsGrid.style.display = 'grid';
-                dimensionsGrid.style.gridTemplateColumns = '1fr 1fr 1fr';
-                dimensionsGrid.style.gap = '15px';
+                // Item name field
+                const itemNameField = document.createElement('div');
+                itemNameField.className = 'form-field full-width';
+                itemNameField.style.marginBottom = '20px';
                 
-                // Dužina field
+                const itemNameLabel = document.createElement('label');
+                itemNameLabel.textContent = 'Naziv predmeta';
+                itemNameLabel.style.fontWeight = '500';
+                itemNameField.appendChild(itemNameLabel);
+                
+                const itemNameInput = document.createElement('textarea');
+                itemNameInput.name = `item_${i}_name`;
+                itemNameInput.required = true;
+                itemNameInput.placeholder = 'Unesite naziv predmeta...';
+                itemNameInput.style.minHeight = '80px';
+                itemNameInput.style.resize = 'vertical';
+                itemNameField.appendChild(itemNameInput);
+                
+                itemSection.appendChild(itemNameField);
+                
+                // Dimensions and weight section
+                const dimensionsSection = document.createElement('div');
+                dimensionsSection.style.display = 'grid';
+                dimensionsSection.style.gridTemplateColumns = '1fr 1fr 1fr 1fr';
+                dimensionsSection.style.gap = '15px';
+                dimensionsSection.style.marginBottom = '20px';
+                
+                // Length field
                 const lengthField = createDimensionField(`item_${i}_length`, 'Dužina (cm)', 'number');
-                dimensionsGrid.appendChild(lengthField);
+                dimensionsSection.appendChild(lengthField);
                 
-                // Širina field
+                // Width field
                 const widthField = createDimensionField(`item_${i}_width`, 'Širina (cm)', 'number');
-                dimensionsGrid.appendChild(widthField);
+                dimensionsSection.appendChild(widthField);
                 
-                // Visina field
+                // Height field
                 const heightField = createDimensionField(`item_${i}_height`, 'Visina (cm)', 'number');
-                dimensionsGrid.appendChild(heightField);
+                dimensionsSection.appendChild(heightField);
                 
-                itemSection.appendChild(dimensionsGrid);
+                // Weight field
+                const weightField = createDimensionField(`item_${i}_weight`, 'Težina (kg)', 'number');
+                dimensionsSection.appendChild(weightField);
+                
+                itemSection.appendChild(dimensionsSection);
+                
                 itemContainer.appendChild(itemSection);
             }
             
-            // Insert after the current field
+            // Insert after the item_count field
             fieldDiv.parentNode.insertBefore(itemContainer, fieldDiv.nextSibling);
+        }
+        
+        // Function to create dimension/weight field
+        function createDimensionField(name, label, type) {
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'form-field';
+            
+            const fieldLabel = document.createElement('label');
+            fieldLabel.textContent = label;
+            fieldLabel.style.fontWeight = '500';
+            fieldLabel.style.fontSize = '14px';
+            fieldDiv.appendChild(fieldLabel);
+            
+            const fieldInput = document.createElement('input');
+            fieldInput.type = type;
+            fieldInput.name = name;
+            fieldInput.required = true;
+            fieldInput.placeholder = '0';
+            fieldInput.style.width = '100%';
+            fieldInput.style.padding = '10px';
+            fieldInput.style.border = '1px solid var(--secondary-light)';
+            fieldInput.style.borderRadius = '4px';
+            fieldInput.style.fontSize = '14px';
+            fieldDiv.appendChild(fieldInput);
+            
+            return fieldDiv;
         }
         
         // Function to remove item fields
@@ -1504,34 +1555,6 @@
             if (existingContainer) {
                 existingContainer.remove();
             }
-        }
-        
-        // Function to create dimension field
-        function createDimensionField(name, label, type) {
-            const fieldDiv = document.createElement('div');
-            fieldDiv.className = 'form-field';
-            
-            const labelElement = document.createElement('label');
-            labelElement.textContent = label;
-            labelElement.style.fontSize = '14px';
-            labelElement.style.color = 'var(--text)';
-            labelElement.style.marginBottom = '5px';
-            labelElement.style.display = 'block';
-            
-            const input = document.createElement('input');
-            input.type = type;
-            input.name = name;
-            input.required = true;
-            input.style.width = '100%';
-            input.style.padding = '8px 12px';
-            input.style.border = '1px solid var(--secondary-light)';
-            input.style.borderRadius = '4px';
-            input.style.fontSize = '14px';
-            
-            fieldDiv.appendChild(labelElement);
-            fieldDiv.appendChild(input);
-            
-            return fieldDiv;
         }
     </script>
 </body>
