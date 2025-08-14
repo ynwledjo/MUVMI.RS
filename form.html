@@ -138,6 +138,16 @@
             font-family: 'Inter', sans-serif;
         }
 
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--secondary-dark);
+            border-radius: var(--border-radius-md);
+            font-size: 14px;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
         /* Date input specific styles */
         input[type="date"] {
             appearance: none;
@@ -1487,13 +1497,7 @@
                 itemNameInput.name = `item_${i}_name`;
                 itemNameInput.required = true;
                 itemNameInput.placeholder = 'Unesite naziv predmeta...';
-                itemNameInput.style.height = '40px';
-                itemNameInput.style.width = '100%';
-                itemNameInput.style.padding = '10px';
-                itemNameInput.style.border = '1px solid var(--secondary-light)';
-                itemNameInput.style.borderRadius = '4px';
-                itemNameInput.style.fontSize = '14px';
-                itemNameInput.style.boxSizing = 'border-box';
+                itemNameInput.className = 'form-input';
                 itemNameField.appendChild(itemNameInput);
                 
                 itemSection.appendChild(itemNameField);
@@ -1553,12 +1557,7 @@
             fieldInput.name = name;
             fieldInput.required = true;
             fieldInput.placeholder = '0';
-            fieldInput.style.width = '100%';
-            fieldInput.style.padding = '10px';
-            fieldInput.style.border = '1px solid var(--secondary-light)';
-            fieldInput.style.borderRadius = '4px';
-            fieldInput.style.fontSize = '14px';
-            fieldInput.style.boxSizing = 'border-box';
+            fieldInput.className = 'form-input';
             fieldDiv.appendChild(fieldInput);
             
             return fieldDiv;
