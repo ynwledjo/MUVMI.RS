@@ -571,6 +571,7 @@
                   options: ['Hitno', 'U toku nedelje', 'Izaberite datum', 'Još uvek ne znam datum'] },
             ],
             moving: [
+                { type: 'text', name: 'description', label: 'Ukratko opišite selidbu', fullWidth: true },
                 { type: 'select', name: 'property_type_pickup', label: 'Izaberite tip imovine (mesto utovara)', required: false,
                   options: ['Kuća', 'Stan', 'Duplex', 'Vikendica'] },
                 { type: 'select', name: 'property_type_delivery', label: 'Izaberite tip imovine (mesto istovara)', required: false,
@@ -583,7 +584,6 @@
                   options: ['Da', 'Ne'] },
                 { type: 'text', name: 'parking_info_pickup', label: 'Parking info (mesto utovara)' },
                 { type: 'text', name: 'parking_info_delivery', label: 'Parking info (mesto istovara)' },
-                { type: 'text', name: 'description', label: 'Ukratko opišite selidbu', fullWidth: true },
                 { type: 'number', name: 'number_of_rooms', label: 'Broj soba' },
                 { type: 'select', name: 'moving_date', label: 'Datum selidbe', required: false,
                   options: ['Hitno', 'U toku nedelje', 'Izaberite datum', 'Još uvek ne znam datum'] },
