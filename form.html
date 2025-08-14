@@ -1488,8 +1488,12 @@
                 itemNameInput.required = true;
                 itemNameInput.placeholder = 'Unesite naziv predmeta...';
                 itemNameInput.style.height = '40px';
+                itemNameInput.style.width = '100%';
+                itemNameInput.style.padding = '10px';
                 itemNameInput.style.border = '1px solid var(--secondary-light)';
                 itemNameInput.style.borderRadius = '4px';
+                itemNameInput.style.fontSize = '14px';
+                itemNameInput.style.boxSizing = 'border-box';
                 itemNameField.appendChild(itemNameInput);
                 
                 itemSection.appendChild(itemNameField);
@@ -1554,6 +1558,7 @@
             fieldInput.style.border = '1px solid var(--secondary-light)';
             fieldInput.style.borderRadius = '4px';
             fieldInput.style.fontSize = '14px';
+            fieldInput.style.boxSizing = 'border-box';
             fieldDiv.appendChild(fieldInput);
             
             return fieldDiv;
