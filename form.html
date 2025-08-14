@@ -1142,7 +1142,7 @@
 
         function createFormField(field) {
             const fieldDiv = document.createElement('div');
-            fieldDiv.className = `form-field ${field.fullWidth ? 'full-width' : ''}`;
+            fieldDiv.className = `form-field ${(field.fullWidth || field.name === 'item_count') ? 'full-width' : ''}`;
             
             // If field is hidden by default, hide the field div
             if (field.hidden) {
@@ -1449,8 +1449,9 @@
             
             // Create container for item fields
             const itemContainer = document.createElement('div');
-            itemContainer.className = 'item-fields-container';
+            itemContainer.className = 'form-field full-width item-fields-container';
             itemContainer.style.marginTop = '20px';
+            itemContainer.style.gridColumn = '1 / -1';
             
             for (let i = 1; i <= count; i++) {
                 // Create item section
@@ -1464,7 +1465,7 @@
                 
                 // Item title
                 const itemTitle = document.createElement('h4');
-                itemTitle.textContent = `Predmet ${i} (npr. kauc)`;
+                itemTitle.textContent = `Predmet ${i}`;
                 itemTitle.style.margin = '0 0 20px 0';
                 itemTitle.style.color = 'var(--text)';
                 itemTitle.style.fontSize = '16px';
@@ -1481,12 +1482,14 @@
                 itemNameLabel.style.fontWeight = '500';
                 itemNameField.appendChild(itemNameLabel);
                 
-                const itemNameInput = document.createElement('textarea');
+                const itemNameInput = document.createElement('input');
+                itemNameInput.type = 'text';
                 itemNameInput.name = `item_${i}_name`;
                 itemNameInput.required = true;
                 itemNameInput.placeholder = 'Unesite naziv predmeta...';
-                itemNameInput.style.minHeight = '80px';
-                itemNameInput.style.resize = 'vertical';
+                itemNameInput.style.height = '40px';
+                itemNameInput.style.border = '1px solid var(--secondary-light)';
+                itemNameInput.style.borderRadius = '4px';
                 itemNameField.appendChild(itemNameInput);
                 
                 itemSection.appendChild(itemNameField);
@@ -1499,19 +1502,19 @@
                 dimensionsSection.style.marginBottom = '20px';
                 
                 // Length field
-                const lengthField = createDimensionField(`item_${i}_length`, 'Dužina (cm)', 'number');
+                const lengthField = createDimensionField(`item_${i}_length`, 'Dužina <span>(cm)</span>', 'number');
                 dimensionsSection.appendChild(lengthField);
                 
                 // Width field
-                const widthField = createDimensionField(`item_${i}_width`, 'Širina (cm)', 'number');
+                const widthField = createDimensionField(`item_${i}_width`, 'Širina <span>(cm)</span>', 'number');
                 dimensionsSection.appendChild(widthField);
                 
                 // Height field
-                const heightField = createDimensionField(`item_${i}_height`, 'Visina (cm)', 'number');
+                const heightField = createDimensionField(`item_${i}_height`, 'Visina <span>(cm)</span>', 'number');
                 dimensionsSection.appendChild(heightField);
                 
                 // Weight field
-                const weightField = createDimensionField(`item_${i}_weight`, 'Težina (kg)', 'number');
+                const weightField = createDimensionField(`item_${i}_weight`, 'Težina <span>(kg)</span>', 'number');
                 dimensionsSection.appendChild(weightField);
                 
                 itemSection.appendChild(dimensionsSection);
@@ -1519,8 +1522,15 @@
                 itemContainer.appendChild(itemSection);
             }
             
-            // Insert after the item_count field
-            fieldDiv.parentNode.insertBefore(itemContainer, fieldDiv.nextSibling);
+            // Insert after the disassembly_needed field if present; otherwise after item_count
+            const parentGrid = fieldDiv.parentNode;
+            const disassemblySelect = parentGrid.querySelector('select[name="disassembly_needed"]');
+            const disassemblyFieldDiv = disassemblySelect ? disassemblySelect.closest('.form-field') : null;
+            if (disassemblyFieldDiv) {
+                parentGrid.insertBefore(itemContainer, disassemblyFieldDiv.nextSibling);
+            } else {
+                parentGrid.insertBefore(itemContainer, fieldDiv.nextSibling);
+            }
         }
         
         // Function to create dimension/weight field
@@ -1529,7 +1539,7 @@
             fieldDiv.className = 'form-field';
             
             const fieldLabel = document.createElement('label');
-            fieldLabel.textContent = label;
+            fieldLabel.innerHTML = label;
             fieldLabel.style.fontWeight = '500';
             fieldLabel.style.fontSize = '14px';
             fieldDiv.appendChild(fieldLabel);
