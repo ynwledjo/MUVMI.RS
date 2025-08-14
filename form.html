@@ -939,6 +939,20 @@
             phoneField.appendChild(phoneWrapper);
             formGrid.insertBefore(phoneField, submitDiv);
             
+            // Add budget field after phone field
+            const budgetField = document.createElement('div');
+            budgetField.className = 'form-field';
+            const budgetLabel = document.createElement('label');
+            budgetLabel.textContent = 'Budžet (Opciono)';
+            const budgetInput = document.createElement('input');
+            budgetInput.type = 'text';
+            budgetInput.name = 'budget';
+            budgetInput.required = false;
+            budgetInput.placeholder = 'Unesite vaš budžet...';
+            budgetField.appendChild(budgetLabel);
+            budgetField.appendChild(budgetInput);
+            formGrid.insertBefore(budgetField, submitDiv);
+            
             // Add checkbox for terms acceptance before the submit button
             const termsField = document.createElement('div');
             termsField.className = 'form-field full-width';
