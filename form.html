@@ -439,8 +439,12 @@
         const formConfigs = {
             furniture: [
                 { type: 'text', name: 'description', label: 'Ukratko opišite šta premeštate', fullWidth: true },
-                { type: 'select', name: 'largest_item_size', label: 'Veličina najvećeg predmeta', required: false,
-                  options: ['Mali (stane u auto)', 'Srednji (stane u kombi)', 'Veliki (zahteva kamion)'] },
+                { type: 'select', name: 'property_type_pickup', label: 'Izaberite tip imovine (mesto utovara)', required: false,
+                  options: ['Kuća', 'Stan', 'Duplex', 'Vikendica', 'Kancelarija', 'Drugo'] },
+                { type: 'select', name: 'property_type_delivery', label: 'Izaberite tip imovine (mesto istovara)', required: false,
+                  options: ['Kuća', 'Stan', 'Duplex', 'Vikendica', 'Kancelarija', 'Drugo'] },
+                { type: 'select', name: 'largest_item_size', label: 'Cela pošiljka staje u', required: false,
+                  options: ['Auto', 'Kombi', 'Kamion'] },
                 { type: 'number', name: 'item_count', label: 'Broj predmeta' },
                 { type: 'select', name: 'assembly_needed', label: 'Da li je potrebna demontaža', required: false,
                   options: ['Ne', 'Da'] },
@@ -509,6 +513,10 @@
             ],
             boxes: [
                 { type: 'text', name: 'description', label: 'Ukratko opišite šta premeštate', fullWidth: true },
+                { type: 'select', name: 'property_type_pickup', label: 'Izaberite tip imovine (mesto utovara)', required: false,
+                  options: ['Kuća', 'Stan', 'Duplex', 'Vikendica', 'Kancelarija', 'Drugo'] },
+                { type: 'select', name: 'property_type_delivery', label: 'Izaberite tip imovine (mesto istovara)', required: false,
+                  options: ['Kuća', 'Stan', 'Duplex', 'Vikendica', 'Kancelarija', 'Drugo'] },
                 { type: 'number', name: 'box_count', label: 'Broj kutija' },
                 { type: 'select', name: 'handling', label: 'Potrebno Rukovanje', required: false, options: ['Izaberite rukovanje', 'Standardno', 'Pazljivo', 'Specijalno'] },
                 { type: 'select', name: 'box_sizes', label: 'Težina kutija', required: false,
@@ -539,6 +547,10 @@
             ],
             cargo: [
                 { type: 'text', name: 'description', label: 'Ukratko opišite šta premeštate', fullWidth: true },
+                { type: 'select', name: 'property_type_pickup', label: 'Izaberite tip imovine (mesto utovara)', required: false,
+                  options: ['Kuća', 'Stan', 'Duplex', 'Vikendica', 'Kancelarija', 'Drugo'] },
+                { type: 'select', name: 'property_type_delivery', label: 'Izaberite tip imovine (mesto istovara)', required: false,
+                  options: ['Kuća', 'Stan', 'Duplex', 'Vikendica', 'Kancelarija', 'Drugo'] },
                 { type: 'textarea', name: 'cargo_description', label: 'Opis tereta', fullWidth: true },
                 { type: 'textarea', name: 'packaging_description', label: 'Opis pakovanja', fullWidth: true },
                 { type: 'text', name: 'dimensions', label: 'Dimenzije' },
@@ -587,9 +599,9 @@
             moving: [
                 { type: 'text', name: 'description', label: 'Ukratko opišite selidbu', fullWidth: true },
                 { type: 'select', name: 'property_type_pickup', label: 'Izaberite tip imovine (mesto utovara)', required: false,
-                  options: ['Kuća', 'Stan', 'Duplex', 'Vikendica'] },
+                  options: ['Kuća', 'Stan', 'Duplex', 'Vikendica', 'Kancelarija', 'Drugo'] },
                 { type: 'select', name: 'property_type_delivery', label: 'Izaberite tip imovine (mesto istovara)', required: false,
-                  options: ['Kuća', 'Stan', 'Duplex', 'Vikendica'] },
+                  options: ['Kuća', 'Stan', 'Duplex', 'Vikendica', 'Kancelarija', 'Drugo'] },
                 { type: 'number', name: 'pickup_floor', label: 'Sprat (mesto utovara)' },
                 { type: 'number', name: 'delivery_floor', label: 'Sprat (mesto istovara)' },
                 { type: 'select', name: 'has_elevator_pickup', label: 'Da li zgrada ima lift (mesto utovara)', required: false,
