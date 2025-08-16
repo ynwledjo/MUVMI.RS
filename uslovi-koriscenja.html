@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uslovi Korišćenja | Muvmi</title>
+    <meta name="description" content="Uslovi korišćenja Muvmi platforme. Upoznajte se sa pravilima i uslovima korišćenja naših usluga.">
+    <link rel="icon" type="image/x-icon" href="favicon_io/favicon.ico">
+    <style>
+        /* Reset CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        :root {
+            --primary: #f16622;
+            --primary-light: #ff8c4d;
+            --primary-dark: #d85a1a;
+            --secondary: #f5f3ed;
+            --secondary-dark: #e8e4dd;
+            --text: #2d3436;
+            --text-light: #636e72;
+            --white: #ffffff;
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.1);
+            --border-radius-md: 6px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--white);
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--white);
+            box-shadow: var(--shadow-sm);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 16px 40px;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .logo {
+            width: 50px;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo a {
+            display: block;
+            width: 100%;
+        }
+
+        .logo img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .logo:hover {
+            transform: scale(1.1);
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: transparent;
+            color: var(--primary);
+            text-decoration: none;
+            border-radius: var(--border-radius-md);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 2px solid var(--primary);
+            margin-left: auto;
+        }
+
+        .back-button:hover {
+            background: var(--primary);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 100px;
+            padding: 60px 0;
+            background: var(--white);
+        }
+
+        .content-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .page-title h1 {
+            font-size: 42px;
+            color: var(--text);
+            margin-bottom: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            font-family: 'Manrope', sans-serif;
+            line-height: 1.2;
+        }
+
+        .page-title p {
+            font-size: 18px;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .content-section {
+            background: var(--white);
+            border: 1px solid var(--secondary-dark);
+            border-radius: var(--border-radius-md);
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .content-section h2 {
+            font-size: 24px;
+            color: var(--text);
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-family: 'Manrope', sans-serif;
+            position: relative;
+            padding-bottom: 16px;
+        }
+
+        .content-section h2:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .content-section p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-light);
+            margin-bottom: 16px;
+        }
+
+        .content-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .content-section ul {
+            margin: 16px 0;
+            padding-left: 20px;
+        }
+
+        .content-section li {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .highlight {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .important-note {
+            background: var(--secondary);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--border-radius-md);
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .important-note p {
+            font-size: 16px;
+            color: var(--text);
+            font-weight: 600;
+            margin: 0;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--text);
+            color: var(--white);
+            padding: 40px 0 20px;
+            margin-top: 60px;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            text-align: center;
+        }
+
+        .footer-brand h3 {
+            font-size: 22px;
+            margin-bottom: 16px;
+            position: relative;
+            padding-bottom: 12px;
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .footer-brand h3:after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .footer-description {
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 20px;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .footer-bottom {
+            padding: 20px 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 20px;
+        }
+
+        .copyright {
+            color: rgba(255,255,255,0.5);
+            font-size: 13px;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 12px 16px;
+                gap: 16px;
+            }
+
+            .logo {
+                width: 40px;
+            }
+
+            .back-button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            .main-content {
+                margin-top: 80px;
+                padding: 40px 0;
+            }
+
+            .content-container {
+                padding: 0 20px;
+            }
+
+            .page-title h1 {
+                font-size: 32px;
+                margin-bottom: 16px;
+            }
+
+            .page-title p {
+                font-size: 16px;
+            }
+
+            .content-section {
+                padding: 30px 20px;
+                margin-bottom: 20px;
+            }
+
+            .content-section h2 {
+                font-size: 20px;
+                margin-bottom: 16px;
+            }
+
+            .content-section p,
+            .content-section li {
+                font-size: 15px;
+            }
+
+            .important-note {
+                padding: 16px;
+            }
+
+            .important-note p {
+                font-size: 15px;
+            }
+
+            .footer-container {
+                padding: 0 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title h1 {
+                font-size: 28px;
+            }
+
+            .content-section {
+                padding: 24px 16px;
+            }
+
+            .content-section h2 {
+                font-size: 18px;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="IMAGES/muvmi-logo.webp" alt="Muvmi">
+                </a>
+            </div>
+            <a href="index.html" class="back-button">← Nazad na početnu</a>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-container">
+            <div class="page-title">
+                <h1>USLOVI KORIŠĆENJA</h1>
+                <p>Dobrodošli na sajt Muvmi.rs. Upoznajte se sa pravilima i uslovima korišćenja naših usluga.</p>
+            </div>
+
+            <div class="content-section">
+                <h2>1. O nama</h2>
+                <p><span class="highlight">Muvmi</span> je posrednička platforma koja povezuje korisnike sa prevoznicima i ekipama za selidbe na teritoriji Republike Srbije. Napominjemo da Muvmi ne obavlja prevoz niti selidbe direktno, već posreduje u povezivanju korisnika sa vozačima i transportnim partnerima.</p>
+            </div>
+
+            <div class="content-section">
+                <h2>2. Način korišćenja usluge</h2>
+                <p>Korisnici mogu putem telefona, kontakt forme ili online platforme dostaviti informacije o potrebama za prevozom ili selidbom. Nakon prijema zahteva, naš tim kontaktira korisnika radi potvrde tačnosti podataka i detalja usluge.</p>
+                <p>Muvmi zadržava pravo da u skladu sa raspoloživošću i kriterijumima kvaliteta odabere najpogodnijeg partnera za izvršenje usluge.</p>
+                <p>Naručivanje usluge se smatra potvrđenim kada korisnik dobije potvrdu od Muvmi tima ili od vozača/ekipe koja će izvršiti uslugu.</p>
+            </div>
+
+            <div class="content-section">
+                <h2>3. Potvrda i validacija podataka</h2>
+                <ul>
+                    <li>Korisnik je dužan da unese tačne i potpune podatke prilikom popunjavanja forme ili komunikacije sa Muvmi timom.</li>
+                    <li>Muvmi zadržava pravo da odbije ili ukloni zahteve ukoliko utvrdi da su podaci netačni, nekompletni ili sumnjivi.</li>
+                </ul>
+            </div>
+
+            <div class="content-section">
+                <h2>4. Odgovornost</h2>
+                <div class="important-note">
+                    <p>Muvmi nije izvršilac usluge prevoza ili selidbe i ne snosi odgovornost za bilo kakve štete, kašnjenja ili nepravilnosti nastale u toku realizacije usluge koju pružaju treća lica – vozači ili selidbene ekipe.</p>
+                </div>
+                <p>Ukoliko dođe do nesuglasica ili problema u vezi sa uslugom, Muvmi će pružiti podršku u rešavanju spora, ali ne može garantovati ishod.</p>
+            </div>
+
+            <div class="content-section">
+                <h2>5. Cena i plaćanje</h2>
+                <ul>
+                    <li>Cene usluga formiraju se u dogovoru između korisnika, Muvmi posrednika i vozača ili selidbene ekipe.</li>
+                    <li>Muvmi ostvaruje prihod putem dogovorene provizije od vozača ili korisnika, u skladu sa prethodnim dogovorom.</li>
+                    <li>Plaćanja se vrše direktno izvršiocu usluge ili preko Muvmi platforme, u zavisnosti od dogovora sa korisnikom i partnerima.</li>
+                </ul>
+            </div>
+
+            <div class="content-section">
+                <h2>6. Zaštita podataka</h2>
+                <p>Muvmi poštuje privatnost korisnika i prikupljene lične podatke koristi isključivo za potrebe izvršenja usluge i komunikacije. Podaci se neće deliti sa trećim licima osim sa odabranim partnerima uključenim u realizaciju usluge.</p>
+            </div>
+
+            <div class="content-section">
+                <h2>7. Intelektualna svojina</h2>
+                <p>Sav sadržaj na sajtu <span class="highlight">Muvmi.rs</span>, uključujući tekstove, slike, logotipe i grafičke elemente, zaštićen je autorskim pravima i ne sme se kopirati, distribuirati ili koristiti bez izričite saglasnosti vlasnika.</p>
+            </div>
+
+            <div class="content-section">
+                <h2>8. Izmene uslova korišćenja</h2>
+                <p>Muvmi zadržava pravo da u bilo kom trenutku menja ove uslove korišćenja. Sve izmene biće objavljene na ovom sajtu, a nastavkom korišćenja platforme smatraće se da ste prihvatili izmene.</p>
+            </div>
+
+            <div class="content-section">
+                <h2>Hvala što koristite Muvmi.rs!</h2>
+                <p>Korišćenjem naše platforme saglasni ste sa gore navedenim uslovima korišćenja. Molimo vas da ih pažljivo pročitate. Ukoliko se ne slažete sa ovim uslovima, molimo vas da ne koristite naše usluge.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h3>Muvmi</h3>
+                <p class="footer-description">Vaš pouzdani partner za transport i dostavu.</p>
+            </div>
+            <div class="footer-bottom">
+                <div class="copyright">
+                    <p>&copy; 2025 Muvmi. Sva prava zadržana.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html> 
